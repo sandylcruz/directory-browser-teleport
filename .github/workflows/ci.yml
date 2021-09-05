@@ -1,0 +1,69 @@
+name: continuous-integration
+on: push
+
+jobs:
+  commitlint:
+    name: Commit Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v4
+  eslint:
+    name: ESLint
+    needs:
+      - commitlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - id: nvm
+        name: Read .nvmrc
+        run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+      - name: 'Set Up Node'
+        uses: 'actions/setup-node@v1'
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+      - name: Install dependencies
+        run: yarn install
+      - name: ESLint
+        run: ./scripts/ci/eslint.sh
+  jest:
+    name: Jest
+    needs:
+      - commitlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - id: nvm
+        name: Read .nvmrc
+        run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+      - name: 'Set Up Node'
+        uses: 'actions/setup-node@v1'
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+      - name: Install dependencies
+        run: yarn install
+      - name: Jest
+        run: ./scripts/ci/jest.sh
+  typescript:
+    name: TypeScript
+    needs:
+      - commitlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - id: nvm
+        name: Read .nvmrc
+        run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+      - name: 'Set Up Node'
+        uses: 'actions/setup-node@v1'
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+      - name: Install dependencies
+        run: yarn install
+      - name: TypeScript
+        run: ./scripts/ci/typescript.sh
