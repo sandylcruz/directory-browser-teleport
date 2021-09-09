@@ -10,7 +10,7 @@ const FolderContainer = styled.div`
   margin: 10px;
 
   box-sizing: border-box;
-  border: 1px solid grey;
+  border: 1px solid ${({ theme }) => theme.colors.grey[300]};
   padding-bottom: 100px;
   padding-left: 300px;
   padding-right: 300px;

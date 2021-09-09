@@ -6,6 +6,10 @@ import { postLogin } from '../util/sessionApiUtil';
 import { useCurrentUser } from '../providers/CurrentUserProvider';
 import Button from './Button';
 
+const ErrorBox = styled.div`
+  color: red;
+`;
+
 const LoginContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -65,6 +69,7 @@ const Span = styled.span`
 const LoginForm = React.memo(() => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
   const history = useHistory();
 
   const { setCurrentUser } = useCurrentUser();
@@ -75,12 +80,12 @@ const LoginForm = React.memo(() => {
 
       postLogin(email, password)
         .then((response) => {
+          setLoginError('');
           setCurrentUser(response);
           history.push('/folder');
         })
         .catch(() => {
-          // TODO: Given more time, add proper form errors.
-          alert('Invalid credentials');
+          setLoginError('Invalid credentials');
         });
     },
     [email, password]
@@ -121,6 +126,7 @@ const LoginForm = React.memo(() => {
               />
             </Label>
           </Span>
+          <ErrorBox aria-live="polite">{loginError}</ErrorBox>
           <Button hue="primaryHue" type="submit">
             Submit
           </Button>

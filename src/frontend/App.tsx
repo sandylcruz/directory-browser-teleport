@@ -60,9 +60,13 @@ const Navbar = React.memo(() => {
   const handleLogoutClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
 
-    postLogout().then(() => {
-      setCurrentUser(null);
-    });
+    postLogout()
+      .then(() => {
+        setCurrentUser(null);
+      })
+      .catch(() => {
+        setCurrentUser(null);
+      });
   };
 
   return (
