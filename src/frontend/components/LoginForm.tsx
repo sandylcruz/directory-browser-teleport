@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 
 import { postLogin } from '../util/sessionApiUtil';
 import { useCurrentUser } from '../providers/CurrentUserProvider';
+import { useErrors } from '../providers/ErrorProvider';
 import Button from './Button';
 
 const ErrorBox = styled.div`
@@ -60,6 +61,7 @@ const LoginForm = React.memo(() => {
   const history = useHistory();
 
   const { setCurrentUser } = useCurrentUser();
+  const { addError } = useErrors();
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -71,7 +73,7 @@ const LoginForm = React.memo(() => {
         history.push('/folder');
       })
       .catch((error) => {
-        setLoginError(error.message);
+        addError(error.message);
       });
   };
 

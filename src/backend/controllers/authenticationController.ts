@@ -19,7 +19,10 @@ export const login: RequestHandler = (req, res) => {
   const { body } = req;
 
   if (!isValidLoginRequestBody(body)) {
-    res.sendStatus(422);
+    res.status(422).json({
+      error:
+        'Malformed request received. Please contact us to help resolve this error.',
+    });
   } else {
     User.findUserByEmail(body.email).then((user) => {
       if (user) {
@@ -34,11 +37,11 @@ export const login: RequestHandler = (req, res) => {
               res.json(user);
             });
           } else {
-            res.sendStatus(401);
+            res.status(401).json({ error: 'Invalid credentials provided.' });
           }
         });
       } else {
-        res.sendStatus(401);
+        res.status(401).json({ error: 'Invalid credentials provided.' });
       }
     });
   }

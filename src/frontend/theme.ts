@@ -22,6 +22,7 @@ export interface Colors {
   blue: ColorEntry;
   green: ColorEntry;
   grey: ColorEntry;
+  red: ColorEntry;
   white: string;
 }
 
@@ -74,6 +75,16 @@ const theme: Theme = {
       700: '#787878',
       800: '#787878',
       900: '#424242',
+    },
+    red: {
+      200: '#ff9ea8',
+      300: '#fa8490',
+      400: '#e86471',
+      500: '#d94c5a',
+      600: '#cc2d3d',
+      700: '#c21728',
+      800: '#960b18',
+      900: '#730610',
     },
     white: '#ffffff',
   },

@@ -54,7 +54,12 @@ describe('login', () => {
   it('does not redirect to /folder on unsuccessful login', async () => {
     server.use(
       rest.post('/api/v1/login', (req, res, ctx) => {
-        return res(ctx.status(401));
+        return res(
+          ctx.status(401),
+          ctx.json({
+            error: 'Invalid credentials',
+          })
+        );
       })
     );
     const history = createMemoryHistory();

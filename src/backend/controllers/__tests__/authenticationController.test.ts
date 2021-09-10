@@ -22,30 +22,41 @@ describe('authentication controller', () => {
         const mockRequest = generateMockRequest({
           body: { password: '123456' },
         });
-        const mockSendStatus = jest.fn();
+        const mockJson = jest.fn();
+        const mockStatus = jest.fn(() => ({ json: mockJson }));
         const mockResponse = generateMockResponse({
-          sendStatus: mockSendStatus,
+          status: mockStatus as unknown as Response['status'],
         });
 
         AuthenticationController.login(mockRequest, mockResponse, next);
 
-        expect(mockSendStatus).toHaveBeenCalledTimes(1);
-        expect(mockSendStatus).toHaveBeenLastCalledWith(422);
+        expect(mockStatus).toHaveBeenCalledTimes(1);
+        expect(mockStatus).toHaveBeenLastCalledWith(422);
+        expect(mockJson).toHaveBeenCalledTimes(1);
+        expect(mockJson).toHaveBeenLastCalledWith({
+          error:
+            'Malformed request received. Please contact us to help resolve this error.',
+        });
       });
 
       it('returns a 422 when no password is passed', () => {
         const mockRequest = generateMockRequest({
           body: { email: 'test@gmail.com' },
         });
-        const mockSendStatus = jest.fn();
+        const mockJson = jest.fn();
+        const mockStatus = jest.fn(() => ({ json: mockJson }));
         const mockResponse = generateMockResponse({
-          sendStatus: mockSendStatus,
+          status: mockStatus as unknown as Response['status'],
         });
 
         AuthenticationController.login(mockRequest, mockResponse, next);
 
-        expect(mockSendStatus).toHaveBeenCalledTimes(1);
-        expect(mockSendStatus).toHaveBeenLastCalledWith(422);
+        expect(mockStatus).toHaveBeenCalledTimes(1);
+        expect(mockStatus).toHaveBeenLastCalledWith(422);
+        expect(mockJson).toHaveBeenLastCalledWith({
+          error:
+            'Malformed request received. Please contact us to help resolve this error.',
+        });
       });
     });
   });

@@ -2,15 +2,18 @@ import React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 
+import { useErrors } from './providers/ErrorProvider';
 import AuthRoute from './components/AuthRoute';
 import CurrentUserProvider, {
   useCurrentUser,
 } from './providers/CurrentUserProvider';
+import ErrorProvider from './providers/ErrorProvider';
 import Folder from './components/Folder';
 import LoginForm from './components/LoginForm';
 import { postLogout } from './util/sessionApiUtil';
 import theme from './theme';
 import Button from './components/Button';
+import GlobalErrorBanner from './components/GlobalErrorBanner';
 
 const GlobalStyles = createGlobalStyle`
   html, body {
@@ -55,6 +58,7 @@ const StyledLink = styled(Link)`
 
 const Navbar = React.memo(() => {
   const { currentUser, setCurrentUser } = useCurrentUser();
+  const { addError } = useErrors();
 
   const handleLogoutClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
@@ -63,8 +67,8 @@ const Navbar = React.memo(() => {
       .then(() => {
         setCurrentUser(null);
       })
-      .catch(() => {
-        setCurrentUser(null);
+      .catch((error) => {
+        addError(error.message);
       });
   };
 
@@ -87,22 +91,25 @@ const Navbar = React.memo(() => {
 });
 
 const App = React.memo(() => (
-  <ThemeProvider theme={theme}>
-    <CurrentUserProvider>
-      <>
-        <GlobalStyles />
-        <Navbar />
-        <Content>
-          <InnerContent>
-            <Switch>
-              <Route path="/login" component={LoginForm} />
-              <AuthRoute path="/folder" component={Folder} />
-            </Switch>
-          </InnerContent>
-        </Content>
-      </>
-    </CurrentUserProvider>
-  </ThemeProvider>
+  <ErrorProvider>
+    <ThemeProvider theme={theme}>
+      <CurrentUserProvider>
+        <>
+          <GlobalStyles />
+          <Navbar />
+          <Content>
+            <InnerContent>
+              <GlobalErrorBanner />
+              <Switch>
+                <Route path="/login" component={LoginForm} />
+                <AuthRoute path="/folder" component={Folder} />
+              </Switch>
+            </InnerContent>
+          </Content>
+        </>
+      </CurrentUserProvider>
+    </ThemeProvider>
+  </ErrorProvider>
 ));
 
 export default App;

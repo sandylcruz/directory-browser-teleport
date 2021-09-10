@@ -1,5 +1,7 @@
 import type { User } from '../../types';
 
+const is4xxError = (status: number) => status >= 400 && status <= 499;
+
 export const postLogin = (email: string, password: string): Promise<User> =>
   fetch('/api/v1/login', {
     method: 'POST',
@@ -8,22 +10,34 @@ export const postLogin = (email: string, password: string): Promise<User> =>
       email,
       password,
     }),
-  }).then((res) => {
-    if (res.ok) {
-      return res.json();
-    } else if (res.status === 401) {
-      throw new Error('Invalid credentials');
-    } else {
-      throw new Error('Unexpected error');
-    }
-  });
+  })
+    .then((res) => {
+      const { status } = res;
+      if (res.ok || is4xxError(status)) {
+        return res.json();
+      } else {
+        throw new Error('Unexpected error');
+      }
+    })
+    .then((json) => {
+      if (json.error) {
+        throw new Error(json.error);
+      }
+      return json;
+    });
 
 export const postLogout = (): Promise<void> =>
   fetch('/api/v1/login', {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   }).then((res) => {
-    if (!res.ok) {
-      throw new Error('Logout unsuccessful');
+    if (is4xxError(res.status)) {
+      return res.json().then((json) => {
+        throw new Error(json.error);
+      });
+    } else if (res.ok) {
+      return;
+    } else {
+      throw new Error('Unexpected error');
     }
   });

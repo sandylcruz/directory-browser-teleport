@@ -40,10 +40,15 @@ describe('logout', () => {
     await waitFor(() => screen.getByText('Sign In'));
   });
 
-  it('redirects to /login on logout even if the server fails to respond', async () => {
+  it('shows correct error if logout is unsuccessful', async () => {
     server.use(
       rest.delete('/api/v1/login', (req, res, ctx) => {
-        return res(ctx.status(500));
+        return res(
+          ctx.status(422),
+          ctx.json({
+            error: 'Unsuccessful logout',
+          })
+        );
       })
     );
     const history = createMemoryHistory();
@@ -64,6 +69,6 @@ describe('logout', () => {
 
     fireEvent.click(logoutButton);
 
-    await waitFor(() => screen.getByText('Sign In'));
+    await waitFor(() => screen.getByText('Unsuccessful logout'));
   });
 });
