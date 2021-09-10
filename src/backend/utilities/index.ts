@@ -1,193 +1,106 @@
-import fs from 'fs';
-import path from 'path';
-import readline from 'readline';
+import { ulid } from 'ulid';
 
-export const appendToTable = (
-  fileName: string,
-  data: string
-): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const tablePath = path.join(__dirname, '../db', `${fileName}.csv`);
-    fs.appendFile(tablePath, data, (error) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve();
-      }
-    });
-  });
-};
+import type Session from '../models/session';
+import type User from '../models/user';
 
-export const ensureDbFilesExist = (): void => {
-  fileEntries.forEach((entry) => {
-    if (!fs.existsSync(entry.file)) {
-      console.log(
-        `Unable to find database file for ${entry.file}. Writing file now...`
-      );
-
-      const data = entry.lines.join('\n');
-
-      fs.writeFileSync(entry.file, data);
-    }
-  });
-};
-
-export const findInFile = <T>(
-  fileName: string,
-  headers: string,
-  callback: (entity: T) => boolean,
-  lineParser: (line: string) => T
-): Promise<T | null> =>
-  new Promise((resolve) => {
-    const fileStream = fs.createReadStream(
-      path.join(__dirname, '../db', `${fileName}.csv`)
-    );
-
-    const lineReader = readline.createInterface({
-      input: fileStream,
-      crlfDelay: Infinity,
-    });
-
-    let lineNumber = 0;
-
-    lineReader.on('line', (line) => {
-      if (lineNumber === 0) {
-        if (line !== headers) {
-          fileStream.destroy();
-          throw new Error(
-            'Expected table to have appropriate columns, but it did not.'
-          );
-        }
-      } else {
-        const entity = lineParser(line);
-        const isDesiredEntity = callback(entity);
-
-        if (isDesiredEntity) {
-          fileStream.destroy();
-          resolve(entity);
-        }
-      }
-
-      lineNumber++;
-    });
-
-    lineReader.on('close', () => {
-      resolve(null);
-    });
-  });
-
-export const filterFileRows = <T>(
-  fileName: string,
-  headers: string,
-  callback: (entity: T) => boolean,
-  lineParser: (line: string) => T
-): Promise<void> => {
-  const filePath = path.join(__dirname, '../db', `${fileName}.csv`);
-
-  return new Promise<string[]>((resolve) => {
-    const fileStream = fs.createReadStream(filePath);
-
-    const lineReader = readline.createInterface({
-      input: fileStream,
-      crlfDelay: Infinity,
-    });
-    const lines: string[] = [];
-
-    lineReader.on('line', (line) => {
-      if (lines.length === 0) {
-        if (line !== headers) {
-          fileStream.destroy();
-          throw new Error(
-            'Expected table to have appropriate columns, but it did not.'
-          );
-        }
-        lines.push(line);
-      } else {
-        const entity = lineParser(line);
-        const isDesiredEntity = callback(entity);
-        if (isDesiredEntity) {
-          lines.push(line);
-        }
-      }
-    });
-
-    lineReader.on('close', () => {
-      resolve(lines);
-    });
-  }).then(
-    (lines) =>
-      new Promise((resolve) => {
-        fs.writeFile(filePath, lines.join('\n'), (err) => {
-          if (err) {
-            throw new Error('Unexpected error writing file.');
-          }
-
-          resolve();
-        });
-      })
-  );
-};
-
-export const getNextId = (fileName: string): Promise<number> => {
-  return new Promise((resolve) => {
-    // validate first line is id not something else
-    const fileStream = fs.createReadStream(
-      path.join(__dirname, '../db', `${fileName}.csv`)
-    );
-
-    const lineReader = readline.createInterface({
-      input: fileStream,
-      crlfDelay: Infinity,
-    });
-
-    let lastLineSeen: string | null = null;
-
-    let lineNumber = 0;
-
-    // get the last line, then parse it for the id
-    lineReader.on('line', (line) => {
-      if (lineNumber === 0) {
-        if (!line.startsWith('id')) {
-          throw new Error('Expected line to start with `id`, but it did not.');
-        }
-      } else {
-        lastLineSeen = line;
-      }
-
-      lineNumber++;
-    });
-
-    lineReader.on('close', () => {
-      if (lastLineSeen === null) {
-        resolve(1);
-      } else {
-        const id = lastLineSeen.split(',')[0];
-        const idAsNumber = Number(id);
-        resolve(idAsNumber + 1);
-      }
-    });
-  });
-};
-
-const sessionTokensPath = path.join(__dirname, '../db/sessionTokens.csv');
-const usersDbPath = path.join(__dirname, '../db/users.csv');
-
-interface DbFileEntry {
-  file: string;
-  lines: Array<string>;
+interface InMemoryDB {
+  sessions: Session[];
+  users: User[];
 }
 
-const fileEntries: Array<DbFileEntry> = [
-  {
-    file: sessionTokensPath,
-    lines: ['id,userId,expirationDate,token'],
-  },
-  {
-    file: usersDbPath,
-    lines: [
-      'id,email,passwordDigest',
-      // User mock seed: (email is test@gmail.com, password is 123456)
-      '1,test@gmail.com,d97bfaea9d6a9f567bd0fc1dbed08b29:a281dce81ff31a79e352cef6f646167915b2451da6160619832e20805941eec7819ae5065927cb4c66fb5f9ed59122bbfc19fab17c3d4814606d688d5041afb3',
-    ],
-  },
-];
+const inMemoryDB: InMemoryDB = {
+  sessions: [],
+  users: [],
+};
+
+export const addSessionToDB = (session: Session): Promise<void> =>
+  new Promise((resolve, reject) => {
+    const { sessions } = inMemoryDB;
+
+    const isValidSession = !sessions.some(
+      ({ id, token }) => id === session.id || token === session.token
+    );
+
+    if (!isValidSession) {
+      reject('Expected ID and token to be unique, but they were not.');
+    } else {
+      inMemoryDB.sessions = [...sessions, session];
+
+      resolve();
+    }
+  });
+
+export const addUserToDB = (user: User): Promise<void> =>
+  new Promise((resolve, reject) => {
+    const { users } = inMemoryDB;
+
+    const isValidUser = !users.some(
+      ({ id, email }) => id === user.id || email === user.email
+    );
+
+    if (!isValidUser) {
+      reject('Expected ID and email to be unique, but they were not.');
+    } else {
+      inMemoryDB.users = [...users, user];
+
+      resolve();
+    }
+  });
+
+export const removeExpiredSessionsFromDB = (): Promise<void> =>
+  new Promise((resolve) => {
+    const { sessions } = inMemoryDB;
+
+    inMemoryDB.sessions = sessions.filter(
+      (session) => session.expirationDate > Date.now()
+    );
+
+    resolve();
+  });
+
+export const removeSessionByToken = (token: string): Promise<void> =>
+  new Promise((resolve) => {
+    const { sessions } = inMemoryDB;
+
+    inMemoryDB.sessions = sessions.filter((session) => session.token !== token);
+
+    resolve();
+  });
+
+export const findUserBySessionToken = (
+  sessionToken: string
+): Promise<User | null> =>
+  new Promise((resolve) => {
+    const { sessions } = inMemoryDB;
+
+    const session = sessions.find((session) => session.token === sessionToken);
+
+    if (!session || !session.isValid()) {
+      resolve(null);
+    } else {
+      const { users } = inMemoryDB;
+
+      const user = users.find((user) => user.id === session.userId);
+
+      if (user) {
+        resolve(user);
+      } else {
+        resolve(null);
+      }
+    }
+  });
+
+export const findUserByEmail = (email: string): Promise<User | null> =>
+  new Promise((resolve) => {
+    const { users } = inMemoryDB;
+
+    const user = users.find((user) => user.email === email);
+
+    if (user) {
+      resolve(user);
+    } else {
+      resolve(null);
+    }
+  });
+
+export const generateId = (): string => ulid();

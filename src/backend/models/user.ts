@@ -1,38 +1,29 @@
 import crypto from 'crypto';
 
-import { findInFile } from '../utilities';
+import {
+  findUserBySessionToken,
+  findUserByEmail,
+  generateId,
+} from '../utilities';
 import type { User as PublicUser } from '../../types';
 
 interface AllUserProperties {
   email: string;
-  id: number;
+  id: string;
   passwordDigest: string;
 }
 
-const findUserBy = (callback: (user: User) => boolean): Promise<User | null> =>
-  findInFile('users', 'id,email,passwordDigest', callback, (line) => {
-    const [stringId, email, passwordDigest] = line.split(',');
-    const id = Number(stringId);
-    return new User({ id, email, passwordDigest });
-  });
-
 class User {
   email: string;
-  id: number;
+  id: string;
   passwordDigest: string;
 
-  static findUserById(id: number): Promise<PublicUser | null> {
-    return findUserBy((user) => user.id === id).then((user) => {
-      if (!user) {
-        return null;
-      }
-
-      return user.toJSON();
-    });
+  static findUserBySessionToken(token: string): Promise<PublicUser | null> {
+    return findUserBySessionToken(token);
   }
 
   static findUserByEmail(email: string): Promise<User | null> {
-    return findUserBy((user) => user.email === email);
+    return findUserByEmail(email);
   }
 
   static generatePasswordDigest(password: string): Promise<string> {
@@ -44,6 +35,13 @@ class User {
 
         resolve(salt + ':' + derivedKey.toString('hex'));
       });
+    });
+  }
+
+  static generate(email: string, password: string): Promise<User> {
+    return User.generatePasswordDigest(password).then((passwordDigest) => {
+      const id = generateId();
+      return new User({ id, email, passwordDigest });
     });
   }
 

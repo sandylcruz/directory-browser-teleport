@@ -66,6 +66,7 @@
   },
   "dependencies": {
     "cookie-parser": "^1.4.5",
-    "core-js": "3"
+    "core-js": "3",
+    "ulid": "^2.3.0"
   }
 }

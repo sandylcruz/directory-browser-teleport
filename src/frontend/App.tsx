@@ -43,7 +43,6 @@ const StyledNavbar = styled.nav`
   flex-direction: row;
   justify-content: space-between;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.06);
-  top: 0;
   width: 100%;
 `;
 

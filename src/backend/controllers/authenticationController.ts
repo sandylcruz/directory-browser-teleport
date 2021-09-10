@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 
-import SessionToken from '../models/sessionToken';
+import Session from '../models/session';
 import User from '../models/user';
 
 export interface LoginRequestBody {
@@ -25,7 +25,7 @@ export const login: RequestHandler = (req, res) => {
       if (user) {
         user.verifyPassword(body.password).then((isCorrectPassword) => {
           if (isCorrectPassword) {
-            SessionToken.generateSessionToken(user.id).then((sessionToken) => {
+            Session.generateSessionToken(user.id).then((sessionToken) => {
               res.cookie('sessionToken', sessionToken.token, {
                 sameSite: 'strict',
                 secure: true,
@@ -50,7 +50,7 @@ export const logout: RequestHandler = (req, res) => {
   if (!sessionToken) {
     res.sendStatus(201);
   } else {
-    SessionToken.remove(sessionToken.token).then(() => {
+    Session.removeByToken(sessionToken.token).then(() => {
       res.clearCookie('sessionToken');
       res.sendStatus(201);
     });
@@ -63,27 +63,12 @@ export const authenticationMiddleware: RequestHandler = (req, res, next) => {
   if (!sessionToken) {
     next();
   } else {
-    SessionToken.findByToken(sessionToken).then((foundToken) => {
-      if (!foundToken) {
+    User.findUserBySessionToken(sessionToken).then((user) => {
+      if (!user) {
         next();
       } else {
-        if (!foundToken.isValid()) {
-          // Here, we've chosen to delete all expired tokens. This would
-          // obviously not scale well, but it's convenient for purposes of this
-          // MVP.
-          SessionToken.removeAllExpired().then(() => {
-            next();
-          });
-        } else {
-          User.findUserById(foundToken.userId).then((user) => {
-            if (!user) {
-              next();
-            } else {
-              req.currentUser = user;
-              next();
-            }
-          });
-        }
+        req.currentUser = user;
+        next();
       }
     });
   }
