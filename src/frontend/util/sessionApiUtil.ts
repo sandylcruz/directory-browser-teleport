@@ -2,8 +2,8 @@ import type { User } from '../../types';
 
 const is4xxError = (status: number) => status >= 400 && status <= 499;
 
-export const postLogin = (email: string, password: string): Promise<User> =>
-  fetch('/api/v1/login', {
+export const createSession = (email: string, password: string): Promise<User> =>
+  fetch('/api/v1/session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -26,8 +26,8 @@ export const postLogin = (email: string, password: string): Promise<User> =>
       return json;
     });
 
-export const postLogout = (): Promise<void> =>
-  fetch('/api/v1/login', {
+export const destroySession = (): Promise<void> =>
+  fetch('/api/v1/session', {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   }).then((res) => {

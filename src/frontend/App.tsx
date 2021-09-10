@@ -10,7 +10,7 @@ import CurrentUserProvider, {
 import ErrorProvider from './providers/ErrorProvider';
 import Folder from './components/Folder';
 import LoginForm from './components/LoginForm';
-import { postLogout } from './util/sessionApiUtil';
+import { destroySession } from './util/sessionApiUtil';
 import theme from './theme';
 import Button from './components/Button';
 import GlobalErrorBanner from './components/GlobalErrorBanner';
@@ -63,7 +63,7 @@ const Navbar = React.memo(() => {
   const handleLogoutClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
 
-    postLogout()
+    destroySession()
       .then(() => {
         setCurrentUser(null);
       })

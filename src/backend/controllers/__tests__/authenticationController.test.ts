@@ -63,7 +63,7 @@ describe('authentication controller', () => {
 
   describe('logout', () => {
     describe('handling of valid inputs', () => {
-      it('returns a 201 on successful logout', () => {
+      it('returns a 204 on successful logout', () => {
         const mockRequest = generateMockRequest();
         const mockSendStatus = jest.fn();
         const mockResponse = generateMockResponse({
@@ -73,7 +73,7 @@ describe('authentication controller', () => {
         AuthenticationController.logout(mockRequest, mockResponse, next);
 
         expect(mockSendStatus).toHaveBeenCalledTimes(1);
-        expect(mockSendStatus).toHaveBeenLastCalledWith(201);
+        expect(mockSendStatus).toHaveBeenLastCalledWith(204);
       });
     });
   });

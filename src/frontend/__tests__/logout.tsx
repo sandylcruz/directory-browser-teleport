@@ -7,11 +7,7 @@ import { setupServer } from 'msw/node';
 
 import App from '../App';
 
-const server = setupServer(
-  rest.delete('/api/v1/login', (req, res) => {
-    return res();
-  })
-);
+const server = setupServer(rest.delete('/api/v1/session', (req, res) => res()));
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
@@ -42,14 +38,14 @@ describe('logout', () => {
 
   it('shows correct error if logout is unsuccessful', async () => {
     server.use(
-      rest.delete('/api/v1/login', (req, res, ctx) => {
-        return res(
+      rest.delete('/api/v1/session', (req, res, ctx) =>
+        res(
           ctx.status(422),
           ctx.json({
             error: 'Unsuccessful logout',
           })
-        );
-      })
+        )
+      )
     );
     const history = createMemoryHistory();
     history.push('/folder');

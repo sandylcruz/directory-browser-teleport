@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 
-import { postLogin } from '../util/sessionApiUtil';
+import { createSession } from '../util/sessionApiUtil';
 import { useCurrentUser } from '../providers/CurrentUserProvider';
 import { useErrors } from '../providers/ErrorProvider';
 import Button from './Button';
@@ -66,7 +66,7 @@ const LoginForm = React.memo(() => {
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
-    postLogin(email, password)
+    createSession(email, password)
       .then((response) => {
         setLoginError('');
         setCurrentUser(response);

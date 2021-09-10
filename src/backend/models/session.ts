@@ -14,7 +14,7 @@ interface SessionProperties {
   token: string;
 }
 
-const SEVEN_DAYS = 1000 * 60 * 60 * 24 * 7;
+const SEVEN_DAYS_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 7;
 
 class Session {
   id: string;
@@ -25,7 +25,7 @@ class Session {
   static generateSessionToken(userId: string): Promise<Session> {
     const id = generateId();
     const token = crypto.randomBytes(16).toString('base64');
-    const expirationDate = Date.now() + SEVEN_DAYS;
+    const expirationDate = Date.now() + SEVEN_DAYS_IN_MILLISECONDS;
     const session = new Session({
       id,
       userId,

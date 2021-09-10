@@ -8,7 +8,7 @@ import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import App from '../App';
 
 const server = setupServer(
-  rest.post('/api/v1/login', (req, res, ctx) => {
+  rest.post('/api/v1/session', (req, res, ctx) => {
     return res(ctx.json({ id: 1, email: 'test@gmail.com' }));
   })
 );
@@ -53,14 +53,14 @@ describe('login', () => {
 
   it('does not redirect to /folder on unsuccessful login', async () => {
     server.use(
-      rest.post('/api/v1/login', (req, res, ctx) => {
-        return res(
+      rest.post('/api/v1/session', (req, res, ctx) =>
+        res(
           ctx.status(401),
           ctx.json({
             error: 'Invalid credentials',
           })
-        );
-      })
+        )
+      )
     );
     const history = createMemoryHistory();
     history.push('/login');
