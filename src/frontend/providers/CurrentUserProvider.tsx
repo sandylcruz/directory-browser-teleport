@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useContext, useLayoutEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 
 import type { User } from '../../types';
 
@@ -21,15 +21,15 @@ interface CurrentUserProviderProps {
 
 const CurrentUserProvider = React.memo<CurrentUserProviderProps>(
   ({ children }) => {
-    const [currentUser, setCurrentUser] = useState<User | null>(() =>
-      !window.currentUser ? null : window.currentUser
-    );
+    const [currentUser, setCurrentUser] = useState<User | null>(() => {
+      const user = window.currentUser || null;
 
-    useLayoutEffect(() => {
       if (window.currentUser) {
         delete window.currentUser;
       }
-    }, []);
+
+      return user;
+    });
 
     return (
       <CurrentUserContext.Provider
