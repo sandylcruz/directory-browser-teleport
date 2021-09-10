@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { useLayoutEffect } from 'react';
-import { useHistory, Route } from 'react-router-dom';
+import { Redirect, Route } from 'react-router-dom';
 
 import { useCurrentUser } from '../providers/CurrentUserProvider';
 
@@ -11,13 +10,10 @@ interface AuthRouteProps {
 
 const AuthRoute = React.memo<AuthRouteProps>(({ component, path }) => {
   const { currentUser } = useCurrentUser();
-  const history = useHistory();
 
-  useLayoutEffect(() => {
-    if (currentUser === null) {
-      history.push('/login');
-    }
-  }, [currentUser, history]);
+  if (currentUser === null) {
+    return <Redirect to="/login" />;
+  }
 
   return <Route path={path} component={component} />;
 });

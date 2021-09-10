@@ -11,8 +11,10 @@ export const postLogin = (email: string, password: string): Promise<User> =>
   }).then((res) => {
     if (res.ok) {
       return res.json();
-    } else {
+    } else if (res.status === 401) {
       throw new Error('Invalid credentials');
+    } else {
+      throw new Error('Unexpected error');
     }
   });
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useContext, useLayoutEffect, useMemo, useState } from 'react';
+import { useContext, useLayoutEffect, useState } from 'react';
 
 import type { User } from '../../types';
 
@@ -31,16 +31,13 @@ const CurrentUserProvider = React.memo<CurrentUserProviderProps>(
       }
     }, []);
 
-    const value = useMemo(
-      () => ({
-        currentUser,
-        setCurrentUser,
-      }),
-      [currentUser, setCurrentUser]
-    );
-
     return (
-      <CurrentUserContext.Provider value={value}>
+      <CurrentUserContext.Provider
+        value={{
+          currentUser,
+          setCurrentUser,
+        }}
+      >
         {children}
       </CurrentUserContext.Provider>
     );

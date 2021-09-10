@@ -50,7 +50,7 @@ export const logout: RequestHandler = (req, res) => {
   if (!sessionToken) {
     res.sendStatus(201);
   } else {
-    Session.removeByToken(sessionToken.token).then(() => {
+    Session.removeByToken(sessionToken).then(() => {
       res.clearCookie('sessionToken');
       res.sendStatus(201);
     });

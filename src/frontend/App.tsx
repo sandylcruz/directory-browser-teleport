@@ -36,7 +36,7 @@ const InnerContent = styled.div`
 `;
 
 const StyledNavbar = styled.nav`
-  border: 1px solid ${({ theme }) => theme.colors.grey[300]};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey[300]};
   background: white;
   height: 75px;
   display: flex;

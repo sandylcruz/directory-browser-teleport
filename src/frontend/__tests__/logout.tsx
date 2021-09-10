@@ -23,7 +23,7 @@ describe('logout', () => {
     history.push('/folder');
 
     window.currentUser = {
-      id: 1,
+      id: '1',
       email: 'test@gmail.com',
     };
 
@@ -50,7 +50,7 @@ describe('logout', () => {
     history.push('/folder');
 
     window.currentUser = {
-      id: 1,
+      id: '1',
       email: 'test@gmail.com',
     };
 
