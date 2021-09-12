@@ -2,10 +2,11 @@ import crypto from 'crypto';
 
 import {
   addSessionToDB,
-  generateId,
   removeExpiredSessionsFromDB,
   removeSessionByToken,
-} from '../utilities';
+} from '../clients/inMemoryDB/sessions';
+
+import { generateId } from '../utilities';
 
 interface SessionProperties {
   id: string;
@@ -22,7 +23,7 @@ class Session {
   expirationDate: number;
   token: string;
 
-  static generateSessionToken(userId: string): Promise<Session> {
+  static create(userId: string): Promise<Session> {
     const id = generateId();
     const token = crypto.randomBytes(16).toString('base64');
     const expirationDate = Date.now() + SEVEN_DAYS_IN_MILLISECONDS;

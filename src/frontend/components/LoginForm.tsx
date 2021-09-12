@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 
-import { createSession } from '../util/sessionApiUtil';
+import { fetchJson } from '../utilities/fetch';
 import { useCurrentUser } from '../providers/CurrentUserProvider';
 import { useErrors } from '../providers/ErrorProvider';
 import Button from './Button';
+import type { User } from '../../types';
 
 const ErrorBox = styled.div`
   color: red;
@@ -66,7 +67,13 @@ const LoginForm = React.memo(() => {
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
-    createSession(email, password)
+    fetchJson<User>('/api/v1/session', {
+      method: 'POST',
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    })
       .then((response) => {
         setLoginError('');
         setCurrentUser(response);

@@ -15,35 +15,32 @@ const isValidLoginRequestBody = (body: any): body is LoginRequestBody => {
   return typeof email === 'string' && typeof password === 'string';
 };
 
-export const login: RequestHandler = (req, res) => {
-  const { body } = req;
+export const login: RequestHandler = async (req, res) => {
+  try {
+    const { body } = req;
 
-  if (!isValidLoginRequestBody(body)) {
-    res.status(422).json({
-      error:
-        'Malformed request received. Please contact us to help resolve this error.',
+    if (!isValidLoginRequestBody(body)) {
+      res.status(422).json({
+        error:
+          'Malformed request received. Please contact us to help resolve this error.',
+      });
+      return;
+    }
+
+    const user = await User.findUserByCredentials(body.email, body.password);
+    if (!user) throw new Error();
+    const session = await Session.create(user.id);
+
+    res.cookie('sessionToken', session.token, {
+      sameSite: 'strict',
+      secure: true,
+      httpOnly: true,
     });
-  } else {
-    User.findUserByEmail(body.email).then((user) => {
-      if (user) {
-        user.verifyPassword(body.password).then((isCorrectPassword) => {
-          if (isCorrectPassword) {
-            Session.generateSessionToken(user.id).then((sessionToken) => {
-              res.cookie('sessionToken', sessionToken.token, {
-                sameSite: 'strict',
-                secure: true,
-                httpOnly: true,
-              });
-              res.json(user);
-            });
-          } else {
-            res.status(401).json({ error: 'Invalid credentials provided.' });
-          }
-        });
-      } else {
-        res.status(401).json({ error: 'Invalid credentials provided.' });
-      }
-    });
+
+    res.json(user);
+  } catch (error) {
+    // Provide a generic error to avoid leaking unnecessary information.
+    res.status(401).json({ error: 'Invalid credentials provided.' });
   }
 };
 

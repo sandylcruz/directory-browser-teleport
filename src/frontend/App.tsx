@@ -10,7 +10,7 @@ import CurrentUserProvider, {
 import ErrorProvider from './providers/ErrorProvider';
 import Folder from './components/Folder';
 import LoginForm from './components/LoginForm';
-import { destroySession } from './util/sessionApiUtil';
+import { fetchJsonNoContent } from './utilities/fetch';
 import theme from './theme';
 import Button from './components/Button';
 import GlobalErrorBanner from './components/GlobalErrorBanner';
@@ -63,7 +63,7 @@ const Navbar = React.memo(() => {
   const handleLogoutClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
 
-    destroySession()
+    fetchJsonNoContent('/api/v1/session', { method: 'DELETE' })
       .then(() => {
         setCurrentUser(null);
       })

@@ -1,10 +1,11 @@
 import crypto from 'crypto';
 
+import { generateId } from '../utilities';
 import {
   findUserBySessionToken,
   findUserByEmail,
-  generateId,
-} from '../utilities';
+} from '../clients/inMemoryDB/users';
+
 import type { User as PublicUser } from '../../types';
 
 interface AllUserProperties {
@@ -24,6 +25,19 @@ class User {
 
   static findUserByEmail(email: string): Promise<User | null> {
     return findUserByEmail(email);
+  }
+
+  static findUserByCredentials(
+    email: string,
+    password: string
+  ): Promise<User | null> {
+    return findUserByEmail(email).then((user) => {
+      if (!user) return null;
+
+      return user
+        .verifyPassword(password)
+        .then((isValid) => (isValid ? user : null));
+    });
   }
 
   static generatePasswordDigest(password: string): Promise<string> {

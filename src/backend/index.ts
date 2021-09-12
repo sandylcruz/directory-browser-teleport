@@ -5,7 +5,7 @@ import Router from './routes';
 import startLivereloadServer from './livereload';
 import { authenticationMiddleware } from './controllers/authenticationController';
 import User from './models/user';
-import { addUserToDB } from './utilities';
+import { addUserToDB } from './clients/inMemoryDB/users';
 
 const app = express();
 const port = 3000;
