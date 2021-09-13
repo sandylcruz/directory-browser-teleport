@@ -6,6 +6,11 @@ import startLivereloadServer from './livereload';
 import { authenticationMiddleware } from './controllers/authenticationController';
 import User from './models/user';
 import { addUser } from './clients/inMemoryDB/users';
+import {
+  generateMockMyCatsDirectory,
+  generateMockTeleportDirectory,
+} from './clients/inMemoryDB/directories/mocks';
+import { addDirectory } from './clients/inMemoryDB/directories';
 
 const app = express();
 const port = 3000;
@@ -25,5 +30,16 @@ app.listen(port, () => {
   User.generate('test@gmail.com', '123456').then((user) => {
     addUser(user);
     console.log(`Successfully seeded user: ${user.email}`);
+  });
+
+  const teleportDirectory = generateMockTeleportDirectory();
+  const catsDirectory = generateMockMyCatsDirectory();
+
+  Promise.all(
+    [teleportDirectory, catsDirectory].map((directory) =>
+      addDirectory(directory)
+    )
+  ).then(() => {
+    console.log(`Successfully seeded directories`);
   });
 });

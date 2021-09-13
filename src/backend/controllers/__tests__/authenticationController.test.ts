@@ -1,5 +1,6 @@
-import type { Request, Response } from 'express';
 import * as AuthenticationController from '../authenticationController';
+
+import type { Request, Response } from 'express';
 
 describe('authentication controller', () => {
   const generateMockRequest = (overrides: Partial<Request> = {}): Request =>

@@ -1,6 +1,6 @@
-import inMemoryDB from './storage';
+import inMemoryDB from '../storage';
 
-import type Session from '../../models/session';
+import type Session from '../../../models/session';
 
 export const addSession = (session: Session): Promise<void> =>
   new Promise((resolve, reject) => {

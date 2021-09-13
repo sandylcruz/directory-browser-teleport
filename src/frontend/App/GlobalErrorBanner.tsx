@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { useErrors } from '../providers/ErrorProvider';
-
 import styled from 'styled-components';
+
+import { useErrors } from '../providers/ErrorProvider';
 
 const ErrorList = styled.ul`
   padding: 0;

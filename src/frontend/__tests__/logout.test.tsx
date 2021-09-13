@@ -10,7 +10,9 @@ import App from '../App';
 const server = setupServer(
   rest.delete('/api/v1/session', (req, res, ctx) =>
     res(ctx.json({ message: 'OK' }))
-  )
+  ),
+  rest.get('/api/v1/bookmarks', (req, res, ctx) => res(ctx.json([]))),
+  rest.get('/api/v1/folders', (req, res, ctx) => res(ctx.json([])))
 );
 
 beforeAll(() => server.listen());

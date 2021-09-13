@@ -34,7 +34,7 @@ export const baseJsonFetch = (
 // type T. But I'll leave that for another time.
 export const fetchJson = <T>(
   url: string,
-  params: Partial<RequestInit>
+  params: Partial<RequestInit> = {}
 ): Promise<T> =>
   new Promise((resolve, reject) => {
     baseJsonFetch(url, params)

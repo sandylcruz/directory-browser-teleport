@@ -8,9 +8,11 @@ import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import App from '../App';
 
 const server = setupServer(
-  rest.post('/api/v1/session', (req, res, ctx) => {
-    return res(ctx.json({ id: 1, email: 'test@gmail.com' }));
-  })
+  rest.post('/api/v1/session', (req, res, ctx) =>
+    res(ctx.json({ id: 1, email: 'test@gmail.com' }))
+  ),
+  rest.get('/api/v1/bookmarks', (req, res, ctx) => res(ctx.json([]))),
+  rest.get('/api/v1/folders', (req, res, ctx) => res(ctx.json([])))
 );
 
 beforeAll(() => server.listen());
@@ -48,7 +50,7 @@ describe('login', () => {
 
     fireEvent.click(submitButton);
 
-    await waitFor(() => screen.getByText('Folder Placeholder'));
+    await waitFor(() => screen.getByText('↑Name'));
   });
 
   it('does not redirect to /folder on unsuccessful login', async () => {
