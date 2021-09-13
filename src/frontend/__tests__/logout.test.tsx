@@ -7,7 +7,11 @@ import { setupServer } from 'msw/node';
 
 import App from '../App';
 
-const server = setupServer(rest.delete('/api/v1/session', (req, res) => res()));
+const server = setupServer(
+  rest.delete('/api/v1/session', (req, res, ctx) =>
+    res(ctx.json({ message: 'OK' }))
+  )
+);
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());

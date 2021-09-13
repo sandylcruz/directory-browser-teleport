@@ -15,34 +15,28 @@ const CurrentUserContext = React.createContext<CurrentUserContextValue>({
   },
 });
 
-interface CurrentUserProviderProps {
-  children: React.ReactElement;
-}
+const CurrentUserProvider: React.FC = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    const user = window.currentUser || null;
 
-const CurrentUserProvider = React.memo<CurrentUserProviderProps>(
-  ({ children }) => {
-    const [currentUser, setCurrentUser] = useState<User | null>(() => {
-      const user = window.currentUser || null;
+    if (window.currentUser) {
+      delete window.currentUser;
+    }
 
-      if (window.currentUser) {
-        delete window.currentUser;
-      }
+    return user;
+  });
 
-      return user;
-    });
-
-    return (
-      <CurrentUserContext.Provider
-        value={{
-          currentUser,
-          setCurrentUser,
-        }}
-      >
-        {children}
-      </CurrentUserContext.Provider>
-    );
-  }
-);
+  return (
+    <CurrentUserContext.Provider
+      value={{
+        currentUser,
+        setCurrentUser,
+      }}
+    >
+      {children}
+    </CurrentUserContext.Provider>
+  );
+};
 
 export const useCurrentUser = (): CurrentUserContextValue =>
   useContext(CurrentUserContext);

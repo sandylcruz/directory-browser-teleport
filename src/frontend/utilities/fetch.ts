@@ -41,17 +41,3 @@ export const fetchJson = <T>(
       .then((response) => response.json().then(resolve))
       .catch(reject);
   });
-
-// TODO: Ideally, we'd have a single "fetchJson" that is able to handle JSON
-// requests for 204 and otherwise. Maybe conditional types would help out here
-// if we had an additional generic that was inferred from some additional
-// configuration param (e.g. "isExpectingNoContent").
-export const fetchJsonNoContent = (
-  url: string,
-  params: Partial<RequestInit>
-): Promise<void> =>
-  new Promise((resolve, reject) => {
-    baseJsonFetch(url, params)
-      .then(() => resolve())
-      .catch(reject);
-  });

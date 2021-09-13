@@ -2,7 +2,7 @@ import inMemoryDB from './storage';
 
 import type User from '../../models/user';
 
-export const addUserToDB = (user: User): Promise<void> =>
+export const addUser = (user: User): Promise<void> =>
   new Promise((resolve, reject) => {
     const { users } = inMemoryDB;
 
@@ -13,7 +13,7 @@ export const addUserToDB = (user: User): Promise<void> =>
     if (!isValidUser) {
       reject('Expected ID and email to be unique, but they were not.');
     } else {
-      inMemoryDB.users = [...users, user];
+      inMemoryDB.users.push(user);
 
       resolve();
     }

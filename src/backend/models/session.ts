@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 
 import {
-  addSessionToDB,
-  removeExpiredSessionsFromDB,
+  addSession,
+  removeExpiredSessions,
   removeSessionByToken,
 } from '../clients/inMemoryDB/sessions';
 
@@ -34,11 +34,11 @@ class Session {
       token,
     });
 
-    return addSessionToDB(session).then(() => session);
+    return addSession(session).then(() => session);
   }
 
   static removeAllExpired(): Promise<void> {
-    return removeExpiredSessionsFromDB();
+    return removeExpiredSessions();
   }
 
   static removeByToken(token: string): Promise<void> {

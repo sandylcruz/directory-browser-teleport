@@ -13,7 +13,7 @@ const ErrorContext = React.createContext<ErrorContextValue>({
   errors: [],
 });
 
-const ErrorProvider = React.memo(({ children }) => {
+const ErrorProvider: React.FC = ({ children }) => {
   const [errors, setErrors] = useState<string[]>([]);
 
   const addError = (error: string) => {
@@ -45,7 +45,7 @@ const ErrorProvider = React.memo(({ children }) => {
       {children}
     </ErrorContext.Provider>
   );
-});
+};
 
 export const useErrors = (): ErrorContextValue => useContext(ErrorContext);
 

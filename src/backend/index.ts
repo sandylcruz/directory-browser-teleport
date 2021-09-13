@@ -5,7 +5,7 @@ import Router from './routes';
 import startLivereloadServer from './livereload';
 import { authenticationMiddleware } from './controllers/authenticationController';
 import User from './models/user';
-import { addUserToDB } from './clients/inMemoryDB/users';
+import { addUser } from './clients/inMemoryDB/users';
 
 const app = express();
 const port = 3000;
@@ -23,7 +23,7 @@ app.listen(port, () => {
   startLivereloadServer();
 
   User.generate('test@gmail.com', '123456').then((user) => {
-    addUserToDB(user);
+    addUser(user);
     console.log(`Successfully seeded user: ${user.email}`);
   });
 });

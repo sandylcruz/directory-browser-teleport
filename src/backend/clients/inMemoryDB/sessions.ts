@@ -2,7 +2,7 @@ import inMemoryDB from './storage';
 
 import type Session from '../../models/session';
 
-export const addSessionToDB = (session: Session): Promise<void> =>
+export const addSession = (session: Session): Promise<void> =>
   new Promise((resolve, reject) => {
     const { sessions } = inMemoryDB;
 
@@ -19,7 +19,7 @@ export const addSessionToDB = (session: Session): Promise<void> =>
     }
   });
 
-export const removeExpiredSessionsFromDB = (): Promise<void> =>
+export const removeExpiredSessions = (): Promise<void> =>
   new Promise((resolve) => {
     const { sessions } = inMemoryDB;
 

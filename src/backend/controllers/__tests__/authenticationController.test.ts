@@ -63,17 +63,21 @@ describe('authentication controller', () => {
 
   describe('logout', () => {
     describe('handling of valid inputs', () => {
-      it('returns a 204 on successful logout', () => {
+      it('returns a 200 on successful logout', () => {
         const mockRequest = generateMockRequest();
-        const mockSendStatus = jest.fn();
+        const mockClearCookie = jest.fn();
+        const mockJson = jest.fn();
         const mockResponse = generateMockResponse({
-          sendStatus: mockSendStatus,
+          json: mockJson,
+          clearCookie: mockClearCookie,
         });
 
         AuthenticationController.logout(mockRequest, mockResponse, next);
 
-        expect(mockSendStatus).toHaveBeenCalledTimes(1);
-        expect(mockSendStatus).toHaveBeenLastCalledWith(204);
+        expect(mockJson).toHaveBeenCalledTimes(1);
+        expect(mockJson).toHaveBeenLastCalledWith({ message: 'OK' });
+        expect(mockClearCookie).toHaveBeenCalledTimes(1);
+        expect(mockClearCookie).toHaveBeenLastCalledWith('sessionToken');
       });
     });
   });

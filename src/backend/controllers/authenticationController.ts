@@ -47,12 +47,13 @@ export const login: RequestHandler = async (req, res) => {
 export const logout: RequestHandler = (req, res) => {
   const { sessionToken } = req.cookies;
 
+  res.clearCookie('sessionToken');
+
   if (!sessionToken) {
-    res.sendStatus(204);
+    res.json({ message: 'OK' });
   } else {
     Session.removeByToken(sessionToken).then(() => {
-      res.clearCookie('sessionToken');
-      res.sendStatus(204);
+      res.json({ message: 'OK' });
     });
   }
 };
