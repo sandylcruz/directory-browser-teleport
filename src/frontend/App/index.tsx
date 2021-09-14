@@ -3,7 +3,6 @@ import { Route, Switch } from 'react-router-dom';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 
 import AuthRoute from '../AuthRoute';
-import BookmarkProvider from '../providers/BookmarkProvider';
 import CurrentUserProvider from '../providers/CurrentUserProvider';
 import DirectoryBrowser from '../DirectoryBrowser';
 import ErrorProvider from '../providers/ErrorProvider';
@@ -39,19 +38,17 @@ const App = React.memo(() => (
   <ErrorProvider>
     <ThemeProvider theme={theme}>
       <CurrentUserProvider>
-        <BookmarkProvider>
-          <GlobalStyles />
-          <Navbar />
-          <Content>
-            <InnerContent>
-              <GlobalErrorBanner />
-              <Switch>
-                <Route path="/login" component={LoginForm} />
-                <AuthRoute path="/" component={DirectoryBrowser} />
-              </Switch>
-            </InnerContent>
-          </Content>
-        </BookmarkProvider>
+        <GlobalStyles />
+        <Navbar />
+        <Content>
+          <InnerContent>
+            <GlobalErrorBanner />
+            <Switch>
+              <Route path="/login" component={LoginForm} />
+              <AuthRoute path="/" component={DirectoryBrowser} />
+            </Switch>
+          </InnerContent>
+        </Content>
       </CurrentUserProvider>
     </ThemeProvider>
   </ErrorProvider>

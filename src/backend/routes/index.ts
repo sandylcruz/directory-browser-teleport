@@ -28,6 +28,7 @@ AppRouter.get('*', (req, res) => {
           )};</script>`
         : ''
     }
+    <title>Directory Browser</title>
   </head>
 
   <body>

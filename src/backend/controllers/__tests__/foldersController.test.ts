@@ -9,16 +9,16 @@ import type { GetFolderByIdResponse } from '../../clients/inMemoryDB/directories
 
 jest.mock('../../clients/inMemoryDB/directories', () => ({
   getAllDirectories: jest.fn(() => Promise.resolve([])),
-  getDirectoryByIdWithBreadcrumbs: jest.fn(() => Promise.resolve(null)),
+  getDirectoryByIdWithPath: jest.fn(() => Promise.resolve(null)),
 }));
 
 const getAllDirectories =
   DirectoriesInMemoryDB.getAllDirectories as jest.MockedFunction<
     typeof DirectoriesInMemoryDB['getAllDirectories']
   >;
-const getDirectoryByIdWithBreadcrumbs =
-  DirectoriesInMemoryDB.getDirectoryByIdWithBreadcrumbs as jest.MockedFunction<
-    typeof DirectoriesInMemoryDB['getDirectoryByIdWithBreadcrumbs']
+const getDirectoryByIdWithPath =
+  DirectoriesInMemoryDB.getDirectoryByIdWithPath as jest.MockedFunction<
+    typeof DirectoriesInMemoryDB['getDirectoryByIdWithPath']
   >;
 
 describe('folders controller', () => {
@@ -102,10 +102,8 @@ describe('folders controller', () => {
 
   describe('getFolderById', () => {
     beforeEach(() => {
-      getDirectoryByIdWithBreadcrumbs.mockClear();
-      getDirectoryByIdWithBreadcrumbs.mockImplementation(() =>
-        Promise.resolve(null)
-      );
+      getDirectoryByIdWithPath.mockClear();
+      getDirectoryByIdWithPath.mockImplementation(() => Promise.resolve(null));
     });
 
     it('returns a 401 with the correct error message if not logged in', () => {
@@ -142,7 +140,7 @@ describe('folders controller', () => {
 
       FoldersController.getFolderById(mockRequest, mockResponse, next);
 
-      expect(getDirectoryByIdWithBreadcrumbs).toHaveBeenCalledTimes(1);
+      expect(getDirectoryByIdWithPath).toHaveBeenCalledTimes(1);
 
       const lastPromise = getAllDirectories.mock.results[0].value;
 
@@ -159,7 +157,7 @@ describe('folders controller', () => {
     it('returns the correct data when a folder is found', () => {
       const mockId = '123';
       const mockFolderResponse: GetFolderByIdResponse = {
-        breadcrumbs: [
+        path: [
           {
             id: 'a',
             name: 'A',
@@ -180,7 +178,7 @@ describe('folders controller', () => {
         }),
       };
 
-      getDirectoryByIdWithBreadcrumbs.mockImplementation((id) => {
+      getDirectoryByIdWithPath.mockImplementation((id) => {
         if (id === mockId) {
           return Promise.resolve(mockFolderResponse);
         } else {
@@ -199,7 +197,7 @@ describe('folders controller', () => {
 
       FoldersController.getFolderById(mockRequest, mockResponse, next);
 
-      expect(getDirectoryByIdWithBreadcrumbs).toHaveBeenCalledTimes(1);
+      expect(getDirectoryByIdWithPath).toHaveBeenCalledTimes(1);
 
       const lastPromise = getAllDirectories.mock.results[0].value;
 

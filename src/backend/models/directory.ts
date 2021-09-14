@@ -2,7 +2,7 @@ import { generateId } from '../utilities';
 
 import {
   getAllDirectories,
-  getDirectoryByIdWithBreadcrumbs,
+  getDirectoryByIdWithPath,
 } from '../clients/inMemoryDB/directories';
 import type { GetFolderByIdResponse } from '../clients/inMemoryDB/directories';
 
@@ -35,10 +35,8 @@ class Directory {
     return getAllDirectories();
   }
 
-  static getByIdWithBreadcrumbs(
-    id: string
-  ): Promise<GetFolderByIdResponse | null> {
-    return getDirectoryByIdWithBreadcrumbs(id);
+  static getByIdWithPath(id: string): Promise<GetFolderByIdResponse | null> {
+    return getDirectoryByIdWithPath(id);
   }
 
   constructor({ items, id, name }: DirectoryProperties) {

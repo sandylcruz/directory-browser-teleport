@@ -1,10 +1,10 @@
-import { getDirectoryByIdWithBreadcrumbs } from '../';
+import { getDirectoryByIdWithPath } from '../';
 import Directory from '../../../../models/directory';
 import File from '../../../../models/file';
 
 import inMemoryDB from '../../storage';
 
-describe('getDirectoryByIdWithBreadcrumbs()', () => {
+describe('getDirectoryByIdWithPath()', () => {
   const originalInMemoryDBValues = inMemoryDB.directories;
 
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('getDirectoryByIdWithBreadcrumbs()', () => {
   });
 
   it('return null when no directory is found', () => {
-    return getDirectoryByIdWithBreadcrumbs('123').then((response) => {
+    return getDirectoryByIdWithPath('123').then((response) => {
       expect(response).toBe(null);
     });
   });
@@ -30,14 +30,12 @@ describe('getDirectoryByIdWithBreadcrumbs()', () => {
 
     inMemoryDB.directories = mockDirectories;
 
-    return getDirectoryByIdWithBreadcrumbs(mockTargetDirectory.id).then(
-      (response) => {
-        expect(response).toEqual({
-          breadcrumbs: [{ id: mockTargetDirectory.id, name: 'A' }],
-          directory: mockTargetDirectory,
-        });
-      }
-    );
+    return getDirectoryByIdWithPath(mockTargetDirectory.id).then((response) => {
+      expect(response).toEqual({
+        path: [{ id: mockTargetDirectory.id, name: 'A' }],
+        directory: mockTargetDirectory,
+      });
+    });
   });
 
   it('return the correct data when finding a top-level directory that has nested data', () => {
@@ -64,14 +62,12 @@ describe('getDirectoryByIdWithBreadcrumbs()', () => {
 
     inMemoryDB.directories = mockDirectories;
 
-    return getDirectoryByIdWithBreadcrumbs(mockTargetDirectory.id).then(
-      (response) => {
-        expect(response).toEqual({
-          breadcrumbs: [{ id: mockTargetDirectory.id, name: 'A' }],
-          directory: mockTargetDirectory,
-        });
-      }
-    );
+    return getDirectoryByIdWithPath(mockTargetDirectory.id).then((response) => {
+      expect(response).toEqual({
+        path: [{ id: mockTargetDirectory.id, name: 'A' }],
+        directory: mockTargetDirectory,
+      });
+    });
   });
 
   it('return the correct data when finding a more deeply-nested folder', () => {
@@ -98,16 +94,14 @@ describe('getDirectoryByIdWithBreadcrumbs()', () => {
 
     inMemoryDB.directories = mockDirectories;
 
-    return getDirectoryByIdWithBreadcrumbs(mockTargetDirectory.id).then(
-      (response) => {
-        expect(response).toEqual({
-          breadcrumbs: [
-            { id: mockDirectories[0].id, name: 'A' },
-            { id: mockTargetDirectory.id, name: 'B' },
-          ],
-          directory: mockTargetDirectory,
-        });
-      }
-    );
+    return getDirectoryByIdWithPath(mockTargetDirectory.id).then((response) => {
+      expect(response).toEqual({
+        path: [
+          { id: mockDirectories[0].id, name: 'A' },
+          { id: mockTargetDirectory.id, name: 'B' },
+        ],
+        directory: mockTargetDirectory,
+      });
+    });
   });
 });

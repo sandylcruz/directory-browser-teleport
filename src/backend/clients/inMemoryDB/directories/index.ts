@@ -9,10 +9,10 @@ export const getAllDirectories = (): Promise<Array<Directory>> =>
     resolve(directories);
   });
 
-export type Breadcrumb = Pick<Directory, 'id' | 'name'>;
+export type Path = Pick<Directory, 'id' | 'name'>;
 
 export interface GetFolderByIdResponse {
-  breadcrumbs: Breadcrumb[];
+  path: Path[];
   directory: Directory;
 }
 
@@ -21,7 +21,7 @@ export interface GetFolderByIdResponse {
 // average. Pre-order was chosen because it seems like most look-ups will
 // probably be higher in the hierarchy. Maybe after getting statistics on actual
 // usage, we could optimize given actual user behavior.
-export const getDirectoryByIdWithBreadcrumbs = (
+export const getDirectoryByIdWithPath = (
   id: string
 ): Promise<GetFolderByIdResponse | null> =>
   new Promise((resolve) => {
@@ -29,28 +29,28 @@ export const getDirectoryByIdWithBreadcrumbs = (
     const findDirectoryById = (
       id: string,
       node: Directory,
-      breadcrumbs: Breadcrumb[]
+      path: Path[]
     ): GetFolderByIdResponse | null => {
       if (node.type === 'dir' && node.id === id) {
-        breadcrumbs.push({
+        path.push({
           id: node.id,
           name: node.name,
         });
         return {
-          breadcrumbs,
+          path,
           directory: node,
         };
       }
 
       if (node.type === 'dir') {
-        breadcrumbs.push({ id: node.id, name: node.name });
+        path.push({ id: node.id, name: node.name });
       }
 
       for (let i = 0; i < node.items.length; i++) {
         const child = node.items[i];
 
         if (child.type === 'dir') {
-          const response = findDirectoryById(id, child, breadcrumbs);
+          const response = findDirectoryById(id, child, path);
 
           if (response) {
             return response;
@@ -58,16 +58,16 @@ export const getDirectoryByIdWithBreadcrumbs = (
         }
       }
 
-      breadcrumbs.pop();
+      path.pop();
 
       return null;
     };
 
     for (let i = 0; i < directories.length; i++) {
       const directory = directories[i];
-      const breadcrumbs: Array<Breadcrumb> = [];
+      const path: Array<Path> = [];
 
-      const response = findDirectoryById(id, directory, breadcrumbs);
+      const response = findDirectoryById(id, directory, path);
 
       if (response) {
         resolve(response);

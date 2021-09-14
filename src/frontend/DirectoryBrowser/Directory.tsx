@@ -3,18 +3,16 @@ import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 import DirectoryHeader from './DirectoryHeader';
-import type { DirectoryItemWithBookmark } from './types';
+import type { DirectoryItem } from '../../types';
 import { fetchJson } from '../utilities';
 import type { GetFolderByIdResponse } from '../../types';
 import Table from './Table';
-import { useBookmarks } from '../providers/BookmarkProvider';
 
 const Directory = React.memo(() => {
   const { id } = useParams<{ id: string }>();
   const [directoryData, setDirectoryData] =
     useState<GetFolderByIdResponse | null>(null);
   const [filterText, setFilterText] = useState('');
-  const { bookmarks } = useBookmarks();
 
   useEffect(() => {
     fetchJson<GetFolderByIdResponse>(`/api/v1/folders/${id}`).then(
@@ -31,41 +29,28 @@ const Directory = React.memo(() => {
   const { directory } = directoryData || {};
   const { items: directoryItems } = directory || {};
 
-  const filteredDirectoryItems = useMemo<DirectoryItemWithBookmark[]>(() => {
-    const bookmarkedDirectoriesSet = new Set(
-      bookmarks.map((bookmark) => bookmark.directoryId)
-    );
-
-    return directoryItems
-      ? directoryItems
-          .filter(
+  const filteredDirectoryItems = useMemo<DirectoryItem[]>(
+    () =>
+      directoryItems
+        ? directoryItems.filter(
             (item) =>
               item.name.toLowerCase().includes(filterText.toLowerCase()) ||
               item.type.toLowerCase().includes(filterText.toLowerCase())
           )
-          .map((directoryItem) => {
-            if (directoryItem.type === 'dir') {
-              return {
-                ...directoryItem,
-                isBookmarked: bookmarkedDirectoriesSet.has(directoryItem.id),
-              };
-            }
-
-            return directoryItem;
-          })
-      : [];
-  }, [bookmarks, directoryItems, filterText]);
+        : [],
+    [directoryItems, filterText]
+  );
 
   if (directoryData === null) {
     return <div>loading...</div>;
   }
 
-  const { breadcrumbs } = directoryData;
+  const { path } = directoryData;
 
   return (
     <>
       <DirectoryHeader
-        breadcrumbs={breadcrumbs}
+        path={path}
         filterValue={filterText}
         onFilterChange={setFilterText}
       />

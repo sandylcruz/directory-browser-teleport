@@ -3,8 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import type { DirectoryItemWithBookmark, DirectoryWithBookmark } from './types';
-import { useBookmarks } from '../providers/BookmarkProvider';
+import type { DirectoryItem } from '../../types';
 
 const ColumnButton = styled.button`
   background-color: ${({ theme }) => theme.colors.white};
@@ -21,11 +20,6 @@ const ColumnTd = styled.td`
 
 const FolderTr = styled.tr`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey[300]};
-`;
-
-const Input = styled.input`
-  margin: 0;
-  padding: 0;
 `;
 
 const RowTd = styled.td`
@@ -74,7 +68,7 @@ const TableColumn: React.FC<TableColumnProps> = ({
 
 interface TableProps {
   folderId: string;
-  rows: DirectoryItemWithBookmark[];
+  rows: DirectoryItem[];
 }
 
 type SortProperty = 'name' | 'sizeKb' | 'type';
@@ -105,17 +99,10 @@ const DEFAULT_SORT_STATE = {
 } as const;
 
 interface RowProps {
-  onBookmarkChange: (value: DirectoryWithBookmark) => void;
-  row: DirectoryItemWithBookmark;
+  row: DirectoryItem;
 }
 
-const Row = React.memo<RowProps>(({ onBookmarkChange, row }) => {
-  const handleBookmarkChange = () => {
-    if (row.type === 'dir') {
-      onBookmarkChange(row);
-    }
-  };
-
+const Row = React.memo<RowProps>(({ row }) => {
   return (
     <tr key={row.id}>
       <RowTd>
@@ -127,15 +114,7 @@ const Row = React.memo<RowProps>(({ onBookmarkChange, row }) => {
       </RowTd>
       <RowTd>{row.sizeKb} kb</RowTd>
       <RowTd>{row.type}</RowTd>
-      <RowTd>
-        {row.type === 'dir' ? (
-          <Input
-            checked={row.isBookmarked}
-            onChange={handleBookmarkChange}
-            type="checkbox"
-          />
-        ) : null}
-      </RowTd>
+      <RowTd>{row.type === 'dir' ? <button>bookmark</button> : null}</RowTd>
     </tr>
   );
 });
@@ -143,7 +122,6 @@ const Row = React.memo<RowProps>(({ onBookmarkChange, row }) => {
 const Table = React.memo<TableProps>(({ folderId, rows }) => {
   const [sortState, setSortState] = useState<SortState>(DEFAULT_SORT_STATE);
   const { property, direction } = sortState;
-  const { addBookmark, removeBookmark } = useBookmarks();
 
   const sortedRows = useMemo(() => {
     const rowsCopy = [...rows];
@@ -179,14 +157,6 @@ const Table = React.memo<TableProps>(({ folderId, rows }) => {
     });
   };
 
-  const handleBookmarkChange = (directory: DirectoryWithBookmark) => {
-    if (directory.isBookmarked) {
-      removeBookmark(directory.id);
-    } else {
-      addBookmark(directory.id);
-    }
-  };
-
   return (
     <StyledTable>
       <thead>
@@ -212,7 +182,7 @@ const Table = React.memo<TableProps>(({ folderId, rows }) => {
       </thead>
       <StyledTBody>
         {sortedRows.map((row) => (
-          <Row key={row.id} onBookmarkChange={handleBookmarkChange} row={row} />
+          <Row key={row.id} row={row} />
         ))}
       </StyledTBody>
     </StyledTable>

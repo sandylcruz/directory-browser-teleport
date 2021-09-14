@@ -2,16 +2,16 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import type { Breadcrumb } from '../../types';
+import type { Path as PathType } from '../../types';
 
-const BreadcrumbLi = styled.li`
+const PathLi = styled.li`
   &:not(:last-child):after {
     margin-right: 8px;
     content: ' >';
   }
 `;
 
-const BreadcrumbsOl = styled.ol`
+const PathOl = styled.ol`
   list-style: none;
   display: flex;
   flex-direction: row;
@@ -34,22 +34,22 @@ const StyledInput = styled.input`
   margin-right: 10px;
 `;
 
-interface BreadcrumbsProps {
-  breadcrumbs: Array<Breadcrumb>;
+interface PathProps {
+  path: Array<PathType>;
 }
 
-const Breadcrumbs = React.memo<BreadcrumbsProps>(({ breadcrumbs }) => (
-  <BreadcrumbsOl>
-    {breadcrumbs.map((breadcrumb, index) => (
-      <BreadcrumbLi key={breadcrumb.id}>
-        {index === breadcrumbs.length - 1 ? (
-          breadcrumb.name
+const Path = React.memo<PathProps>(({ path }) => (
+  <PathOl>
+    {path.map((pathEntry, index) => (
+      <PathLi key={pathEntry.id}>
+        {index === path.length - 1 ? (
+          pathEntry.name
         ) : (
-          <Link to={`/folders/${breadcrumb.id}`}>{breadcrumb.name}</Link>
+          <Link to={`/folders/${pathEntry.id}`}>{pathEntry.name}</Link>
         )}
-      </BreadcrumbLi>
+      </PathLi>
     ))}
-  </BreadcrumbsOl>
+  </PathOl>
 ));
 
 interface FilterInputProps {
@@ -80,16 +80,16 @@ const FilterInput = React.memo<FilterInputProps>(({ onChange, value }) => {
 });
 
 interface DirectoryHeaderProps {
-  breadcrumbs: Array<Breadcrumb>;
+  path: Array<PathType>;
   onFilterChange: (value: string) => void;
   filterValue: string;
 }
 
 const DirectoryHeader = React.memo<DirectoryHeaderProps>(
-  ({ breadcrumbs, onFilterChange, filterValue }) => {
+  ({ path, onFilterChange, filterValue }) => {
     return (
       <HeaderContainer>
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
+        <Path path={path} />
         <RightSide>
           <FilterInput onChange={onFilterChange} value={filterValue} />
         </RightSide>
