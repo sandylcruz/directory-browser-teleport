@@ -3,33 +3,19 @@ import type { RequestHandler } from 'express';
 import Directory from '../models/directory';
 import { ensureAuthenticated } from './utilities';
 
-export const getFolders: RequestHandler = (req, res) => {
+export const getFolderByPath: RequestHandler = (req, res) => {
   ensureAuthenticated(req, res, () => {
-    Directory.getAll().then((directories) => {
-      res.json(directories.map((directory) => directory.toShallowJSON()));
-    });
-  });
-};
-
-export const getFolderById: RequestHandler = (req, res) => {
-  ensureAuthenticated(req, res, () => {
-    const { folderId } = req.params;
-    Directory.getByIdWithPath(folderId).then((response) => {
-      if (response === null) {
+    Directory.getByPath(req.path).then((directory) => {
+      if (directory === null) {
         res.status(404).json({
-          error: `Unable to find a directory with an id of: ${folderId}`,
+          error: `Unable to find a directory with an path of: ${req.path}`,
         });
       } else {
-        const { path, directory } = response;
-
         res.json({
-          path,
-          directory: {
-            ...directory,
-            items: directory.items.map((item) =>
-              item.type === 'file' ? item : item.toShallowJSON()
-            ),
-          },
+          ...directory,
+          items: directory.items.map((item) =>
+            item.type === 'file' ? item : item.toShallowJSON()
+          ),
         });
       }
     });

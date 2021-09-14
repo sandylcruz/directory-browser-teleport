@@ -2,8 +2,6 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import type { Path as PathType } from '../../types';
-
 const PathLi = styled.li`
   &:not(:last-child):after {
     margin-right: 8px;
@@ -34,23 +32,27 @@ const StyledInput = styled.input`
   margin-right: 10px;
 `;
 
-interface PathProps {
-  path: Array<PathType>;
+interface BreadcrumbsProps {
+  directoryPath: string;
 }
 
-const Path = React.memo<PathProps>(({ path }) => (
-  <PathOl>
-    {path.map((pathEntry, index) => (
-      <PathLi key={pathEntry.id}>
-        {index === path.length - 1 ? (
-          pathEntry.name
-        ) : (
-          <Link to={`/folders/${pathEntry.id}`}>{pathEntry.name}</Link>
-        )}
-      </PathLi>
-    ))}
-  </PathOl>
-));
+const Breadcrumbs = React.memo<BreadcrumbsProps>(({ directoryPath }) => {
+  const pathArray = directoryPath.split('/');
+
+  return (
+    <PathOl>
+      {pathArray.map((pathEntry, index) => (
+        <PathLi key={index}>
+          {index === pathArray.length - 1 ? (
+            pathEntry
+          ) : (
+            <Link to={`/folders/${pathEntry}`}>{`${pathEntry}/`}</Link>
+          )}
+        </PathLi>
+      ))}
+    </PathOl>
+  );
+});
 
 interface FilterInputProps {
   onChange: (value: string) => void;
@@ -80,16 +82,16 @@ const FilterInput = React.memo<FilterInputProps>(({ onChange, value }) => {
 });
 
 interface DirectoryHeaderProps {
-  path: Array<PathType>;
+  directoryPath: string;
   onFilterChange: (value: string) => void;
   filterValue: string;
 }
 
 const DirectoryHeader = React.memo<DirectoryHeaderProps>(
-  ({ path, onFilterChange, filterValue }) => {
+  ({ directoryPath, onFilterChange, filterValue }) => {
     return (
       <HeaderContainer>
-        <Path path={path} />
+        <Breadcrumbs directoryPath={directoryPath} />
         <RightSide>
           <FilterInput onChange={onFilterChange} value={filterValue} />
         </RightSide>

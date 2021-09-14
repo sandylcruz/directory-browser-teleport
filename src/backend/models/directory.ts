@@ -1,15 +1,8 @@
-import { generateId } from '../utilities';
-
-import {
-  getAllDirectories,
-  getDirectoryByIdWithPath,
-} from '../clients/inMemoryDB/directories';
-import type { GetFolderByIdResponse } from '../clients/inMemoryDB/directories';
+import { getDirectoryByPath } from '../clients/fs';
 
 import type File from './file';
 
 interface DirectoryProperties {
-  id: string;
   items: Array<Directory | File>;
   name: string;
 }
@@ -20,28 +13,17 @@ interface AllDirectoryProperties extends DirectoryProperties {
 }
 
 class Directory {
-  id: string;
   items: Array<Directory | File>;
   name: string;
   sizeKb: 0;
   type: 'dir';
 
-  static generate({ items, name }: Omit<DirectoryProperties, 'id'>): Directory {
-    const id = generateId();
-    return new Directory({ items, id, name });
+  static getByPath(path: string): Promise<Directory | null> {
+    return getDirectoryByPath(path);
   }
 
-  static getAll(): Promise<Directory[]> {
-    return getAllDirectories();
-  }
-
-  static getByIdWithPath(id: string): Promise<GetFolderByIdResponse | null> {
-    return getDirectoryByIdWithPath(id);
-  }
-
-  constructor({ items, id, name }: DirectoryProperties) {
+  constructor({ items, name }: DirectoryProperties) {
     this.items = items;
-    this.id = id;
     this.name = name;
     this.sizeKb = 0;
     this.type = 'dir';
@@ -49,7 +31,6 @@ class Directory {
 
   toShallowJSON(): Omit<AllDirectoryProperties, 'items'> {
     return {
-      id: this.id,
       name: this.name,
       sizeKb: this.sizeKb,
       type: this.type,

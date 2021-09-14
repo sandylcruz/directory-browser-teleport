@@ -1,7 +1,4 @@
-import { generateId } from '../utilities';
-
 interface FileProperties {
-  id: string;
   name: string;
   sizeKb: number;
 }
@@ -11,18 +8,15 @@ interface AllFileProperties extends FileProperties {
 }
 
 class File {
-  id: string;
   name: string;
   sizeKb: number;
   type: 'file';
 
   static generate({ name, sizeKb }: Omit<FileProperties, 'id'>): File {
-    const id = generateId();
-    return new File({ id, name, sizeKb });
+    return new File({ name, sizeKb });
   }
 
-  constructor({ id, name, sizeKb }: FileProperties) {
-    this.id = id;
+  constructor({ name, sizeKb }: FileProperties) {
     this.name = name;
     this.sizeKb = sizeKb;
     this.type = 'file';
@@ -30,7 +24,6 @@ class File {
 
   toJSON(): AllFileProperties {
     return {
-      id: this.id,
       name: this.name,
       sizeKb: this.sizeKb,
       type: this.type,

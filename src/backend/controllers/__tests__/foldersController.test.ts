@@ -1,25 +1,18 @@
 import * as FoldersController from '../foldersController';
-import * as DirectoriesInMemoryDB from '../../clients/inMemoryDB/directories';
+import * as FsClient from '../../clients/fs';
 import Directory from '../../models/directory';
 import File from '../../models/file';
 
 import type { Request, Response } from 'express';
 import type { User } from '../../../types';
-import type { GetFolderByIdResponse } from '../../clients/inMemoryDB/directories';
 
-jest.mock('../../clients/inMemoryDB/directories', () => ({
-  getAllDirectories: jest.fn(() => Promise.resolve([])),
-  getDirectoryByIdWithPath: jest.fn(() => Promise.resolve(null)),
+jest.mock('../../clients/fs', () => ({
+  getDirectoryByPath: jest.fn(() => Promise.resolve([])),
 }));
 
-const getAllDirectories =
-  DirectoriesInMemoryDB.getAllDirectories as jest.MockedFunction<
-    typeof DirectoriesInMemoryDB['getAllDirectories']
-  >;
-const getDirectoryByIdWithPath =
-  DirectoriesInMemoryDB.getDirectoryByIdWithPath as jest.MockedFunction<
-    typeof DirectoriesInMemoryDB['getDirectoryByIdWithPath']
-  >;
+const getDirectoryByPath = FsClient.getDirectoryByPath as jest.MockedFunction<
+  typeof FsClient['getDirectoryByPath']
+>;
 
 describe('folders controller', () => {
   const mockCurrentUser: User = {
@@ -40,10 +33,10 @@ describe('folders controller', () => {
     return;
   };
 
-  describe('getFolders', () => {
+  describe('getFolderByPath', () => {
     beforeEach(() => {
-      getAllDirectories.mockClear();
-      getAllDirectories.mockImplementation(() => Promise.resolve([]));
+      getDirectoryByPath.mockClear();
+      getDirectoryByPath.mockImplementation(() => Promise.resolve(null));
     });
 
     it('returns a 401 with the correct error message if not logged in', () => {
@@ -56,67 +49,7 @@ describe('folders controller', () => {
         status: mockStatus as unknown as Response['status'],
       });
 
-      FoldersController.getFolders(mockRequest, mockResponse, next);
-
-      expect(mockStatus).toHaveBeenCalledTimes(1);
-      expect(mockStatus).toHaveBeenLastCalledWith(401);
-      expect(mockJson).toHaveBeenCalledTimes(1);
-      expect(mockJson).toHaveBeenLastCalledWith({
-        error: 'You must be logged in to make this request.',
-      });
-    });
-
-    it('returns the expected data if you are logged in', () => {
-      getAllDirectories.mockImplementation(() =>
-        Promise.resolve([
-          Directory.generate({ name: 'A', items: [] }),
-          Directory.generate({ name: 'B', items: [] }),
-        ])
-      );
-
-      const mockRequest = generateMockRequest({});
-      const mockJson = jest.fn();
-      const mockResponse = generateMockResponse({
-        json: mockJson,
-      });
-
-      FoldersController.getFolders(mockRequest, mockResponse, next);
-
-      expect(getAllDirectories).toHaveBeenCalledTimes(1);
-
-      const lastPromise = getAllDirectories.mock.results[0].value;
-
-      return lastPromise.then(() => {
-        expect(mockJson).toHaveBeenCalledTimes(1);
-        expect(mockJson).toHaveBeenLastCalledWith([
-          expect.objectContaining({
-            name: 'A',
-          }),
-          expect.objectContaining({
-            name: 'B',
-          }),
-        ]);
-      });
-    });
-  });
-
-  describe('getFolderById', () => {
-    beforeEach(() => {
-      getDirectoryByIdWithPath.mockClear();
-      getDirectoryByIdWithPath.mockImplementation(() => Promise.resolve(null));
-    });
-
-    it('returns a 401 with the correct error message if not logged in', () => {
-      const mockRequest = generateMockRequest({
-        currentUser: undefined,
-      });
-      const mockJson = jest.fn();
-      const mockStatus = jest.fn(() => ({ json: mockJson }));
-      const mockResponse = generateMockResponse({
-        status: mockStatus as unknown as Response['status'],
-      });
-
-      FoldersController.getFolderById(mockRequest, mockResponse, next);
+      FoldersController.getFolderByPath(mockRequest, mockResponse, next);
 
       expect(mockStatus).toHaveBeenCalledTimes(1);
       expect(mockStatus).toHaveBeenLastCalledWith(401);
@@ -128,9 +61,7 @@ describe('folders controller', () => {
 
     it('returns a 404 with the correct error message if a directory is not found', () => {
       const mockRequest = generateMockRequest({
-        params: {
-          folderId: '123',
-        },
+        path: '/123',
       });
       const mockJson = jest.fn();
       const mockStatus = jest.fn(() => ({ json: mockJson }));
@@ -138,47 +69,35 @@ describe('folders controller', () => {
         status: mockStatus as unknown as Response['status'],
       });
 
-      FoldersController.getFolderById(mockRequest, mockResponse, next);
+      FoldersController.getFolderByPath(mockRequest, mockResponse, next);
 
-      expect(getDirectoryByIdWithPath).toHaveBeenCalledTimes(1);
+      expect(getDirectoryByPath).toHaveBeenCalledTimes(1);
 
-      const lastPromise = getAllDirectories.mock.results[0].value;
+      const lastPromise = getDirectoryByPath.mock.results[0].value;
 
       return lastPromise.then(() => {
         expect(mockStatus).toHaveBeenCalledTimes(1);
         expect(mockStatus).toHaveBeenLastCalledWith(404);
         expect(mockJson).toHaveBeenCalledTimes(1);
         expect(mockJson).toHaveBeenLastCalledWith({
-          error: 'Unable to find a directory with an id of: 123',
+          error: 'Unable to find a directory with an path of: /123',
         });
       });
     });
 
     it('returns the correct data when a folder is found', () => {
       const mockId = '123';
-      const mockFolderResponse: GetFolderByIdResponse = {
-        path: [
-          {
-            id: 'a',
-            name: 'A',
-          },
-          {
-            id: 'b',
-            name: 'B',
-          },
+      const mockFolderResponse = new Directory({
+        name: 'B',
+        items: [
+          File.generate({
+            name: 'C.go',
+            sizeKb: 100,
+          }),
         ],
-        directory: Directory.generate({
-          name: 'B',
-          items: [
-            File.generate({
-              name: 'C.go',
-              sizeKb: 100,
-            }),
-          ],
-        }),
-      };
+      });
 
-      getDirectoryByIdWithPath.mockImplementation((id) => {
+      getDirectoryByPath.mockImplementation((id) => {
         if (id === mockId) {
           return Promise.resolve(mockFolderResponse);
         } else {
@@ -186,20 +105,18 @@ describe('folders controller', () => {
         }
       });
       const mockRequest = generateMockRequest({
-        params: {
-          folderId: mockId,
-        },
+        path: mockId,
       });
       const mockJson = jest.fn();
       const mockResponse = generateMockResponse({
         json: mockJson,
       });
 
-      FoldersController.getFolderById(mockRequest, mockResponse, next);
+      FoldersController.getFolderByPath(mockRequest, mockResponse, next);
 
-      expect(getDirectoryByIdWithPath).toHaveBeenCalledTimes(1);
+      expect(getDirectoryByPath).toHaveBeenCalledTimes(1);
 
-      const lastPromise = getAllDirectories.mock.results[0].value;
+      const lastPromise = getDirectoryByPath.mock.results[0].value;
 
       return lastPromise.then(() => {
         expect(mockJson).toHaveBeenCalledTimes(1);

@@ -1,32 +1,32 @@
 import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import DirectoryHeader from './DirectoryHeader';
 import type { DirectoryItem } from '../../types';
 import { fetchJson } from '../utilities';
-import type { GetFolderByIdResponse } from '../../types';
+import type { Directory as DirectoryType } from '../../types';
 import Table from './Table';
 
 const Directory = React.memo(() => {
-  const { id } = useParams<{ id: string }>();
-  const [directoryData, setDirectoryData] =
-    useState<GetFolderByIdResponse | null>(null);
+  const location = useLocation();
+  const directoryPath = location.pathname.replace(/^\/folders/, '');
+
+  const [directory, setDirectory] = useState<DirectoryType | null>(null);
   const [filterText, setFilterText] = useState('');
 
   useEffect(() => {
-    fetchJson<GetFolderByIdResponse>(`/api/v1/folders/${id}`).then(
-      (directoryData) => {
-        setDirectoryData(directoryData);
+    fetchJson<DirectoryType>(`/api/v1/folders/${directoryPath}`).then(
+      (directory) => {
+        setDirectory(directory);
       }
     );
-  }, [id]);
+  }, [directoryPath]);
 
   useEffect(() => {
     setFilterText('');
-  }, [id]);
+  }, [directoryPath]);
 
-  const { directory } = directoryData || {};
   const { items: directoryItems } = directory || {};
 
   const filteredDirectoryItems = useMemo<DirectoryItem[]>(
@@ -41,20 +41,22 @@ const Directory = React.memo(() => {
     [directoryItems, filterText]
   );
 
-  if (directoryData === null) {
+  if (directory === null) {
     return <div>loading...</div>;
   }
-
-  const { path } = directoryData;
 
   return (
     <>
       <DirectoryHeader
-        path={path}
+        directoryPath={directoryPath}
         filterValue={filterText}
         onFilterChange={setFilterText}
       />
-      <Table folderId={id} rows={filteredDirectoryItems} />
+      <Table
+        directoryPath={directoryPath}
+        folderId={directoryPath}
+        rows={filteredDirectoryItems}
+      />
     </>
   );
 });

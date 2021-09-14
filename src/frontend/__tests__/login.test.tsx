@@ -12,7 +12,7 @@ const server = setupServer(
     res(ctx.json({ id: 1, email: 'test@gmail.com' }))
   ),
   rest.get('/api/v1/bookmarks', (req, res, ctx) => res(ctx.json([]))),
-  rest.get('/api/v1/folders', (req, res, ctx) => res(ctx.json([])))
+  rest.get('/api/v1/folders/*', (req, res, ctx) => res(ctx.json([])))
 );
 
 beforeAll(() => server.listen());

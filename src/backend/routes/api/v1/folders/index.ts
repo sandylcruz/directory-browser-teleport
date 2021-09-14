@@ -4,8 +4,6 @@ import * as FoldersController from '../../../../controllers/foldersController';
 
 const FoldersRouter = Router();
 
-FoldersRouter.get('/', FoldersController.getFolders);
-
-FoldersRouter.get('/:folderId', FoldersController.getFolderById);
+FoldersRouter.get('/*', FoldersController.getFolderByPath);
 
 export default FoldersRouter;

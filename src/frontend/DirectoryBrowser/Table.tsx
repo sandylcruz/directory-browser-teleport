@@ -68,6 +68,7 @@ const TableColumn: React.FC<TableColumnProps> = ({
 
 interface TableProps {
   folderId: string;
+  directoryPath: string;
   rows: DirectoryItem[];
 }
 
@@ -99,27 +100,31 @@ const DEFAULT_SORT_STATE = {
 } as const;
 
 interface RowProps {
+  directoryPath: string;
   row: DirectoryItem;
 }
 
-const Row = React.memo<RowProps>(({ row }) => {
+const Row = React.memo<RowProps>(({ directoryPath, row }) => {
+  const directoryPathWithoutPrefix = directoryPath === '/' ? '' : directoryPath;
+
   return (
-    <tr key={row.id}>
+    <tr key={row.name}>
       <RowTd>
         {row.type === 'dir' ? (
-          <Link to={`/folders/${row.id}`}>{row.name}</Link>
+          <Link to={`/folders${directoryPathWithoutPrefix}/${row.name}`}>
+            {row.name}
+          </Link>
         ) : (
           row.name
         )}
       </RowTd>
       <RowTd>{row.sizeKb} kb</RowTd>
       <RowTd>{row.type}</RowTd>
-      <RowTd>{row.type === 'dir' ? <button>bookmark</button> : null}</RowTd>
     </tr>
   );
 });
 
-const Table = React.memo<TableProps>(({ folderId, rows }) => {
+const Table = React.memo<TableProps>(({ folderId, directoryPath, rows }) => {
   const [sortState, setSortState] = useState<SortState>(DEFAULT_SORT_STATE);
   const { property, direction } = sortState;
 
@@ -177,12 +182,11 @@ const Table = React.memo<TableProps>(({ folderId, rows }) => {
               {title}
             </TableColumn>
           ))}
-          <td>📖</td>
         </FolderTr>
       </thead>
       <StyledTBody>
         {sortedRows.map((row) => (
-          <Row key={row.id} row={row} />
+          <Row key={row.name} directoryPath={directoryPath} row={row} />
         ))}
       </StyledTBody>
     </StyledTable>

@@ -8,14 +8,4 @@ export type File = ReturnType<FileModel['toJSON']>;
 
 export type DirectoryItem = Directory | File;
 
-export interface Path {
-  id: string;
-  name: string;
-}
-
-export interface GetFolderByIdResponse {
-  path: Array<Path>;
-  directory: Directory;
-}
-
 export type User = ReturnType<UserModel['toJSON']>;
