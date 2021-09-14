@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import Button from './sharedComponents/Button';
 import { fetchJson } from './utilities';
 import { useCurrentUser } from './providers/CurrentUserProvider';
 import { useErrors } from './providers/ErrorProvider';
+import type { LocationState } from './types';
 import type { User } from '../types';
 
 const ErrorBox = styled.div`
@@ -60,6 +61,7 @@ const LoginForm = React.memo(() => {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const history = useHistory();
+  const location = useLocation<LocationState>();
 
   const { setCurrentUser } = useCurrentUser();
   const { addError } = useErrors();
@@ -77,7 +79,13 @@ const LoginForm = React.memo(() => {
       .then((response) => {
         setLoginError('');
         setCurrentUser(response);
-        history.push('/');
+        const { state } = location;
+
+        if (state?.referrer) {
+          history.replace(state?.referrer);
+        } else {
+          history.push('/');
+        }
       })
       .catch((error) => {
         addError(error.message);

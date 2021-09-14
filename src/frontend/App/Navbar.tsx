@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { useHistory } from 'react-router-dom';
 
 import Button from '../sharedComponents/Button';
 import { fetchJson } from '../utilities';
@@ -29,6 +30,7 @@ const StyledNavbar = styled.nav`
 const Navbar = React.memo(() => {
   const { currentUser, setCurrentUser } = useCurrentUser();
   const { addError } = useErrors();
+  const history = useHistory();
 
   const handleLogoutClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
@@ -36,6 +38,7 @@ const Navbar = React.memo(() => {
     fetchJson('/api/v1/session', { method: 'DELETE' })
       .then(() => {
         setCurrentUser(null);
+        history.replace('/login');
       })
       .catch((error) => {
         addError(error.message);

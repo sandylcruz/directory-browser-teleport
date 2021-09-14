@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, useLocation } from 'react-router-dom';
+import type { LocationDescriptorObject } from 'history';
 
 import { useCurrentUser } from './providers/CurrentUserProvider';
+import type { LocationState } from './types';
 
 interface AuthRouteProps {
   component: React.ComponentType;
@@ -11,9 +13,17 @@ interface AuthRouteProps {
 
 const AuthRoute = React.memo<AuthRouteProps>(({ component, exact, path }) => {
   const { currentUser } = useCurrentUser();
+  const location = useLocation();
+
+  const to: LocationDescriptorObject<LocationState> = {
+    pathname: '/login',
+    state: {
+      referrer: location.pathname,
+    },
+  };
 
   if (currentUser === null) {
-    return <Redirect to="/login" />;
+    return <Redirect to={to} />;
   }
 
   return <Route path={path} component={component} exact={exact} />;

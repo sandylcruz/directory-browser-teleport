@@ -1,1 +1,1 @@
-hello hello
+This is a go file
