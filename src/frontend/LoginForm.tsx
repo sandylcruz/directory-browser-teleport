@@ -56,7 +56,7 @@ const Span = styled.span`
   justify-content: center;
 `;
 
-const LoginForm = React.memo(() => {
+const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -133,5 +133,5 @@ const LoginForm = React.memo(() => {
       </Button>
     </Form>
   );
-});
+};
 export default LoginForm;

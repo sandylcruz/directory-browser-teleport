@@ -11,7 +11,7 @@ interface AuthRouteProps {
   path: string;
 }
 
-const AuthRoute = React.memo<AuthRouteProps>(({ component, exact, path }) => {
+const AuthRoute: React.FC<AuthRouteProps> = ({ component, exact, path }) => {
   const { currentUser } = useCurrentUser();
   const location = useLocation();
 
@@ -27,6 +27,6 @@ const AuthRoute = React.memo<AuthRouteProps>(({ component, exact, path }) => {
   }
 
   return <Route path={path} component={component} exact={exact} />;
-});
+};
 
 export default AuthRoute;

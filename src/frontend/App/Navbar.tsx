@@ -27,7 +27,7 @@ const StyledNavbar = styled.nav`
   width: 100%;
 `;
 
-const Navbar = React.memo(() => {
+const Navbar: React.FC = () => {
   const { currentUser, setCurrentUser } = useCurrentUser();
   const { addError } = useErrors();
   const history = useHistory();
@@ -61,6 +61,6 @@ const Navbar = React.memo(() => {
       ) : null}
     </StyledNavbar>
   );
-});
+};
 
 export default Navbar;

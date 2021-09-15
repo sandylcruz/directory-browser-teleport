@@ -16,7 +16,7 @@ const ErrorMessage = styled.li`
   border-radius: 4px;
 `;
 
-const GlobalErrorBanner = React.memo(() => {
+const GlobalErrorBanner: React.FC = () => {
   const { errors } = useErrors();
 
   return (
@@ -28,6 +28,6 @@ const GlobalErrorBanner = React.memo(() => {
       ))}
     </ErrorList>
   );
-});
+};
 
 export default GlobalErrorBanner;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -128,19 +128,15 @@ const Table: React.FC<TableProps> = ({ directoryPath, rows }) => {
   const [sortState, setSortState] = useState<SortState>(DEFAULT_SORT_STATE);
   const { property, direction } = sortState;
 
-  const sortedRows = useMemo(() => {
-    const rowsCopy = [...rows];
+  const sortedRows = [...rows];
 
-    rowsCopy.sort((a, b) => {
-      if (direction === 'asc') {
-        return a[property] < b[property] ? -1 : 1;
-      } else {
-        return a[property] < b[property] ? 1 : -1;
-      }
-    });
-
-    return rowsCopy;
-  }, [property, direction, rows]);
+  sortedRows.sort((a, b) => {
+    if (direction === 'asc') {
+      return a[property] < b[property] ? -1 : 1;
+    } else {
+      return a[property] < b[property] ? 1 : -1;
+    }
+  });
 
   useEffect(() => {
     setSortState(DEFAULT_SORT_STATE);

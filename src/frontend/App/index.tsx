@@ -34,7 +34,7 @@ const InnerContent = styled.div`
   width: 100%;
 `;
 
-const App = React.memo(() => (
+const App: React.FC = () => (
   <ErrorProvider>
     <ThemeProvider theme={theme}>
       <CurrentUserProvider>
@@ -52,6 +52,6 @@ const App = React.memo(() => (
       </CurrentUserProvider>
     </ThemeProvider>
   </ErrorProvider>
-));
+);
 
 export default App;
