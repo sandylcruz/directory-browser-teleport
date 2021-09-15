@@ -12,10 +12,6 @@ class File {
   sizeKb: number;
   type: 'file';
 
-  static generate({ name, sizeKb }: Omit<FileProperties, 'id'>): File {
-    return new File({ name, sizeKb });
-  }
-
   constructor({ name, sizeKb }: FileProperties) {
     this.name = name;
     this.sizeKb = sizeKb;
@@ -30,5 +26,8 @@ class File {
     };
   }
 }
+
+export const generate = ({ name, sizeKb }: Omit<FileProperties, 'id'>): File =>
+  new File({ name, sizeKb });
 
 export default File;

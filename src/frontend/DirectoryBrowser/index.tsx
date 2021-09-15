@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Redirect, Route } from 'react-router-dom';
 
 import Directory from './Directory';
 
-const DirectoryBrowser = React.memo(() => (
+const DirectoryBrowser: React.FC = () => (
   <Switch>
-    <Route path="/" component={Directory} />
-    <Route path="/folders" component={Directory} />
+    <Route path="/folders/:directoryPath*" component={Directory} />
+    <Redirect to="/folders" />
   </Switch>
-));
+);
 
 export default DirectoryBrowser;

@@ -36,11 +36,15 @@ interface BreadcrumbsProps {
   directoryPath: string;
 }
 
-const Breadcrumbs = React.memo<BreadcrumbsProps>(({ directoryPath }) => {
+const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ directoryPath }) => {
   const pathArray = directoryPath.split('/');
 
   return (
     <PathOl>
+      <PathLi key="/">
+        <Link to="/folders">/</Link>
+      </PathLi>
+
       {pathArray.map((pathEntry, index) => (
         <PathLi key={index}>
           {index === pathArray.length - 1 ? (
@@ -52,14 +56,14 @@ const Breadcrumbs = React.memo<BreadcrumbsProps>(({ directoryPath }) => {
       ))}
     </PathOl>
   );
-});
+};
 
 interface FilterInputProps {
   onChange: (value: string) => void;
   value: string;
 }
 
-const FilterInput = React.memo<FilterInputProps>(({ onChange, value }) => {
+const FilterInput: React.FC<FilterInputProps> = ({ onChange, value }) => {
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     const {
       target: { value },
@@ -79,7 +83,7 @@ const FilterInput = React.memo<FilterInputProps>(({ onChange, value }) => {
       />
     </label>
   );
-});
+};
 
 interface DirectoryHeaderProps {
   directoryPath: string;
@@ -87,17 +91,17 @@ interface DirectoryHeaderProps {
   filterValue: string;
 }
 
-const DirectoryHeader = React.memo<DirectoryHeaderProps>(
-  ({ directoryPath, onFilterChange, filterValue }) => {
-    return (
-      <HeaderContainer>
-        <Breadcrumbs directoryPath={directoryPath} />
-        <RightSide>
-          <FilterInput onChange={onFilterChange} value={filterValue} />
-        </RightSide>
-      </HeaderContainer>
-    );
-  }
+const DirectoryHeader: React.FC<DirectoryHeaderProps> = ({
+  directoryPath,
+  onFilterChange,
+  filterValue,
+}) => (
+  <HeaderContainer>
+    <Breadcrumbs directoryPath={directoryPath} />
+    <RightSide>
+      <FilterInput onChange={onFilterChange} value={filterValue} />
+    </RightSide>
+  </HeaderContainer>
 );
 
 export default DirectoryHeader;

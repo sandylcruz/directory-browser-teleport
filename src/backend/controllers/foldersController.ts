@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
 
-import Directory from '../models/directory';
+import * as Directory from '../models/directory';
 import { ensureAuthenticated } from './utilities';
 
 export const getFolderByPath: RequestHandler = (req, res) => {

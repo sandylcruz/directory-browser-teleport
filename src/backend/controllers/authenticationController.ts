@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 
-import Session from '../models/session';
-import User from '../models/user';
+import * as Session from '../models/session';
+import * as User from '../models/user';
 
 export interface LoginRequestBody {
   email: string;

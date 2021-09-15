@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useEffect, useState, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import DirectoryHeader from './DirectoryHeader';
 import type { DirectoryItem } from '../../types';
@@ -8,9 +8,8 @@ import { fetchJson } from '../utilities';
 import type { Directory as DirectoryType } from '../../types';
 import Table from './Table';
 
-const Directory = React.memo(() => {
-  const location = useLocation();
-  const directoryPath = location.pathname.replace(/^\/folders/, '');
+const Directory: React.FC = () => {
+  const { directoryPath = '' } = useParams<{ directoryPath: string }>();
 
   const [directory, setDirectory] = useState<DirectoryType | null>(null);
   const [filterText, setFilterText] = useState('');
@@ -29,17 +28,13 @@ const Directory = React.memo(() => {
 
   const { items: directoryItems } = directory || {};
 
-  const filteredDirectoryItems = useMemo<DirectoryItem[]>(
-    () =>
-      directoryItems
-        ? directoryItems.filter(
-            (item) =>
-              item.name.toLowerCase().includes(filterText.toLowerCase()) ||
-              item.type.toLowerCase().includes(filterText.toLowerCase())
-          )
-        : [],
-    [directoryItems, filterText]
-  );
+  const filteredDirectoryItems: DirectoryItem[] = directoryItems
+    ? directoryItems.filter(
+        (item) =>
+          item.name.toLowerCase().includes(filterText.toLowerCase()) ||
+          item.type.toLowerCase().includes(filterText.toLowerCase())
+      )
+    : [];
 
   if (directory === null) {
     return <div>loading...</div>;
@@ -52,13 +47,9 @@ const Directory = React.memo(() => {
         filterValue={filterText}
         onFilterChange={setFilterText}
       />
-      <Table
-        directoryPath={directoryPath}
-        folderId={directoryPath}
-        rows={filteredDirectoryItems}
-      />
+      <Table directoryPath={directoryPath} rows={filteredDirectoryItems} />
     </>
   );
-});
+};
 
 export default Directory;

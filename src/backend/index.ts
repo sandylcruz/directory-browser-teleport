@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import Router from './routes';
 import startLivereloadServer from './livereload';
 import { authenticationMiddleware } from './controllers/authenticationController';
-import User from './models/user';
+import * as User from './models/user';
 import { addUser } from './clients/inMemoryDB/users';
 
 const app = express();

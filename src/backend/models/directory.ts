@@ -18,10 +18,6 @@ class Directory {
   sizeKb: 0;
   type: 'dir';
 
-  static getByPath(path: string): Promise<Directory | null> {
-    return getDirectoryByPath(path);
-  }
-
   constructor({ items, name }: DirectoryProperties) {
     this.items = items;
     this.name = name;
@@ -44,5 +40,9 @@ class Directory {
     };
   }
 }
+
+export const getByPath = (path: string): Promise<Directory | null> => {
+  return getDirectoryByPath(path);
+};
 
 export default Directory;

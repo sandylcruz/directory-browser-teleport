@@ -1,7 +1,7 @@
 import * as FoldersController from '../foldersController';
 import * as FsClient from '../../clients/fs';
 import Directory from '../../models/directory';
-import File from '../../models/file';
+import * as File from '../../models/file';
 
 import type { Request, Response } from 'express';
 import type { User } from '../../../types';
