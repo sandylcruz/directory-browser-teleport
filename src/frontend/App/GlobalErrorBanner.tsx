@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { useErrors } from '../providers/ErrorProvider';
-
 import styled from 'styled-components';
+
+import { useErrors } from '../providers/ErrorProvider';
 
 const ErrorList = styled.ul`
   padding: 0;
@@ -16,7 +16,7 @@ const ErrorMessage = styled.li`
   border-radius: 4px;
 `;
 
-const GlobalErrorBanner = React.memo(() => {
+const GlobalErrorBanner: React.FC = () => {
   const { errors } = useErrors();
 
   return (
@@ -28,6 +28,6 @@ const GlobalErrorBanner = React.memo(() => {
       ))}
     </ErrorList>
   );
-});
+};
 
 export default GlobalErrorBanner;

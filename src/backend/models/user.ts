@@ -1,10 +1,7 @@
 import crypto from 'crypto';
 
 import { generateId } from '../utilities';
-import {
-  findUserBySessionToken,
-  findUserByEmail,
-} from '../clients/inMemoryDB/users';
+import * as inMemoryDB from '../clients/inMemoryDB/users';
 
 import type { User as PublicUser } from '../../types';
 
@@ -18,46 +15,6 @@ class User {
   email: string;
   id: string;
   passwordDigest: string;
-
-  static findUserBySessionToken(token: string): Promise<PublicUser | null> {
-    return findUserBySessionToken(token);
-  }
-
-  static findUserByEmail(email: string): Promise<User | null> {
-    return findUserByEmail(email);
-  }
-
-  static findUserByCredentials(
-    email: string,
-    password: string
-  ): Promise<User | null> {
-    return findUserByEmail(email).then((user) => {
-      if (!user) return null;
-
-      return user
-        .verifyPassword(password)
-        .then((isValid) => (isValid ? user : null));
-    });
-  }
-
-  static generatePasswordDigest(password: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const salt = crypto.randomBytes(16).toString('hex');
-
-      crypto.scrypt(password, salt, 64, (err, derivedKey) => {
-        if (err) reject(err);
-
-        resolve(salt + ':' + derivedKey.toString('hex'));
-      });
-    });
-  }
-
-  static generate(email: string, password: string): Promise<User> {
-    return User.generatePasswordDigest(password).then((passwordDigest) => {
-      const id = generateId();
-      return new User({ id, email, passwordDigest });
-    });
-  }
 
   constructor({ email, id, passwordDigest }: AllUserProperties) {
     this.email = email;
@@ -82,5 +39,41 @@ class User {
     };
   }
 }
+
+export const findUserBySessionToken = (
+  token: string
+): Promise<PublicUser | null> => inMemoryDB.findUserBySessionToken(token);
+
+export const findUserByEmail = (email: string): Promise<User | null> =>
+  inMemoryDB.findUserByEmail(email);
+
+export const findUserByCredentials = (
+  email: string,
+  password: string
+): Promise<User | null> =>
+  inMemoryDB.findUserByEmail(email).then((user) => {
+    if (!user) return null;
+
+    return user
+      .verifyPassword(password)
+      .then((isValid) => (isValid ? user : null));
+  });
+
+export const generatePasswordDigest = (password: string): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const salt = crypto.randomBytes(16).toString('hex');
+
+    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
+      if (err) reject(err);
+
+      resolve(salt + ':' + derivedKey.toString('hex'));
+    });
+  });
+
+export const generate = (email: string, password: string): Promise<User> =>
+  generatePasswordDigest(password).then((passwordDigest) => {
+    const id = generateId();
+    return new User({ id, email, passwordDigest });
+  });
 
 export default User;

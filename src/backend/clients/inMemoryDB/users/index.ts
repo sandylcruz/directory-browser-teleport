@@ -1,6 +1,6 @@
-import inMemoryDB from './storage';
+import inMemoryDB from '../storage';
 
-import type User from '../../models/user';
+import type User from '../../../models/user';
 
 export const addUser = (user: User): Promise<void> =>
   new Promise((resolve, reject) => {
